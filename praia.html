@@ -2,145 +2,156 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Planejamento Financeiro</title>
+    <title>Checklist – Praia</title>
 
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #fdfdfd;
-            padding-top: 80px; /* espaço para a navbar fixa */
+            background: linear-gradient(to bottom, #bde7f6, #fdf6e3);
+            padding-top: 90px;
         }
 
-        .container {
-            width: 800px;
-            background: white;
+        /* NAVBAR */
+        .navbar {
+            background: white !important;
+            box-shadow: 0 2px 8px #0001;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: #5CAEE3 !important;
+        }
+
+        .nav-link {
+            font-size: 16px;
+            margin-left: 8px;
+            color: #555 !important;
+        }
+
+        .nav-link:hover {
+            color: #5CAEE3 !important;
+        }
+
+        .container-praia {
+            background: #ffffffcc;
+            border-radius: 12px;
             padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px #0002;
+            box-shadow: 0 4px 12px #0002;
+            max-width: 950px;
+            margin: auto;
         }
 
         h1 {
-            font-size: 32px;
-            margin: 0;
+            color: #0077b6;
             font-weight: bold;
         }
 
-        .mes {
-            text-align: right;
-            font-size: 20px;
-            font-weight: bold;
-            color: #5CAEE3;
-        }
-
-        .box-totais {
-            margin-top: 10px;
-            border: 2px solid #000;
-            width: 260px;
-            padding: 10px;
-            font-size: 16px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 16px;
-        }
-
-        table th, table td {
-            border: 1px solid #000;
-            padding: 8px;
-        }
-
-        table .left {
-            text-align: left;
-        }
-
-        .total {
-            font-weight: bold;
-            background: #ffe7c6;
-        }
-
-        .rendas-box {
-            margin-top: 20px;
-            background: #ffe7c6;
-            padding: 15px;
-            width: 250px;
-            border-radius: 8px;
-        }
-
-        .renda-item {
-            background: #ffedcd;
-            padding: 8px;
-            margin-bottom: 8px;
-            border-radius: 6px;
-            border: 1px solid #0002;
-        }
-
-        .frase {
-            margin-top: 20px;
-            background: #ffe7c6;
+        .categoria-box {
+            background: #e3f8ff;
+            border-left: 6px solid #0096c7;
             padding: 15px;
             border-radius: 8px;
-            border: 2px solid #d2b08a;
-            font-size: 14px;
-            width: 250px;
+            margin-bottom: 20px;
         }
 
-        .colunas {
+        .categoria-box h3 {
+            color: #0077b6;
+            margin-bottom: 10px;
+        }
+
+        .item-row {
+            padding: 6px 0;
+            font-size: 16px;
             display: flex;
-            justify-content: space-between;
-            margin-top: 25px;
+            align-items: center;
+        }
+
+        .item-row input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.05);
+        }
+
+        /* Orçamento */
+        .orcamento {
+            background: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px #0001;
+        }
+
+        .gastos p {
+            margin: 4px 0;
+            font-size: 16px;
+        }
+
+        .total-valor {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0077b6;
+        }
+
+        .contador {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #444;
+        }
+
+        .footer-frase {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border-left: 6px solid #e0a800;
+            border-radius: 6px;
+            font-size: 15px;
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
 
-<!-- Navbar suave -->
-<nav class="navbar navbar-expand-lg navbar-light custom-navbar fixed-top shadow-sm">
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top">
     <div class="container-fluid">
 
         <a class="navbar-brand d-flex align-items-center" href="index.html">
-            <img src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons@master/icons/home.svg" width="22" style="margin-right:6px; opacity:0.8;">
+            <i class="bi bi-journal-check" style="font-size:22px; margin-right:6px;"></i>
             Planejamento
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="collapse navbar-collapse" id="menu">
             <ul class="navbar-nav ms-auto">
 
                 <li class="nav-item">
                     <a class="nav-link" href="index.html">
-                        <img src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons@master/icons/home.svg" width="20" style="margin-right:5px; opacity:0.8;">
-                        Início
+                        <i class="bi bi-house-door"></i> Início
                     </a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link" href="planejamento.html">
-                        <img src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons@master/icons/cash.svg" width="20" style="margin-right:5px; opacity:0.8;">
-                        Planejamento
+                        <i class="bi bi-cash-stack"></i> Planejamento
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="praia.html">
-                        <img src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons@master/icons/beach.svg" width="20" style="margin-right:5px; opacity:0.8;">
-                        Praia
+                    <a class="nav-link active" href="praia.html">
+                        <i class="bi bi-sun"></i> Praia
                     </a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link" href="atrasadas.html">
-                        <img src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons@master/icons/alert-circle.svg" width="20" style="margin-right:5px; opacity:0.8;">
-                        Atrasadas
+                        <i class="bi bi-exclamation-triangle"></i> Atrasadas
                     </a>
                 </li>
 
@@ -149,71 +160,158 @@
     </div>
 </nav>
 
+<!-- Conteúdo -->
+<div class="container-praia">
 
-<div class="container">
+    <h1 class="mb-2">Checklist para a Praia 🏖️</h1>
+    <p class="text-muted mb-4">Marque o que já estiver na mala — seu progresso será salvo no navegador.</p>
 
-    <h1>Planejamento Financeiro</h1>
-    <p class="mes">Mês: DEZEMBRO</p>
-
-    <div class="box-totais">
-        <p>Total de Saída: <strong>R$ 2.840,00</strong></p>
-        <p>Praia: <strong>R$ 167,00</strong></p>
-        <p>Saldo Final: <strong>R$ 477,30</strong></p>
+    <!-- Categoria: Roupas -->
+    <div class="categoria-box">
+        <h3>👗 Roupas</h3>
+        <div class="item-row"><input type="checkbox" data-key="roupas_biquini"> Biquínis / Maiôs</div>
+        <div class="item-row"><input type="checkbox" data-key="roupas_saida"> Saída de praia</div>
+        <div class="item-row"><input type="checkbox" data-key="roupas_shorts"> Shorts</div>
+        <div class="item-row"><input type="checkbox" data-key="roupas_vestido"> Vestidos leves</div>
+        <div class="item-row"><input type="checkbox" data-key="roupas_pijama"> Pijamas</div>
+        <div class="item-row"><input type="checkbox" data-key="roupas_interna"> Roupas íntimas</div>
     </div>
 
-    <!-- Tabela de Débitos -->
-    <table>
-        <tr>
-            <th>Débitos</th>
-            <th>Valor</th>
-        </tr>
+    <!-- Categoria: Utensílios -->
+    <div class="categoria-box">
+        <h3>👜 Utensílios</h3>
+        <div class="item-row"><input type="checkbox" data-key="utens_bolsa"> Bolsa de praia</div>
+        <div class="item-row"><input type="checkbox" data-key="utens_toalha"> Toalhas</div>
+        <div class="item-row"><input type="checkbox" data-key="utens_canga"> Canga</div>
+        <div class="item-row"><input type="checkbox" data-key="utens_necessaire"> Necessaire</div>
+        <div class="item-row"><input type="checkbox" data-key="utens_carregador"> Carregador / Powerbank</div>
+        <div class="item-row"><input type="checkbox" data-key="utens_garrafa"> Garrafa térmica</div>
+    </div>
 
-        <tr><td class="left">Luz</td><td>R$ 300,00</td></tr>
-        <tr><td class="left">Cartão Babi</td><td>R$ 800,00</td></tr>
-        <tr><td class="left">Internet</td><td>R$ 120,00</td></tr>
-        <tr><td class="left">Ração Pets</td><td>R$ 300,00</td></tr>
-        <tr><td class="left">Netflix</td><td>R$ 22,90</td></tr>
-        <tr><td class="left">Disney</td><td>R$ 27,90</td></tr>
-        <tr><td class="left">Xbox</td><td>R$ 59,90</td></tr>
-        <tr><td class="left">Vô Nilson</td><td>R$ 150,00</td></tr>
-        <tr><td class="left">Soika</td><td>R$ 150,00</td></tr>
-        <tr><td class="left">Pai</td><td>R$ 50,00</td></tr>
-        <tr><td class="left">Tia</td><td>R$ 100,00</td></tr>
-        <tr><td class="left">Tio Nei</td><td>R$ 70,00</td></tr>
-        <tr><td class="left">Verde</td><td>R$ 180,00</td></tr>
-        <tr><td class="left">Faculdade Babi</td><td>R$ 600,00</td></tr>
-        <tr><td class="left">Mercado</td><td>R$ 600,00</td></tr>
-        <tr><td class="left">Carne</td><td>R$ 200,00</td></tr>
+    <!-- Categoria: Cuidados pessoais -->
+    <div class="categoria-box">
+        <h3>🧴 Cuidados pessoais</h3>
+        <div class="item-row"><input type="checkbox" data-key="cuidados_protetor"> Protetor solar</div>
+        <div class="item-row"><input type="checkbox" data-key="cuidados_lip"> Protetor labial</div>
+        <div class="item-row"><input type="checkbox" data-key="cuidados_hidratante"> Hidratante</div>
+        <div class="item-row"><input type="checkbox" data-key="cuidados_shampoo"> Shampoo e condicionador</div>
+        <div class="item-row"><input type="checkbox" data-key="cuidados_escova"> Escova de dentes / Pasta</div>
+        <div class="item-row"><input type="checkbox" data-key="cuidados_sabonete"> Sabonete / Desodorante</div>
+    </div>
 
-        <tr class="total">
-            <td>Total</td>
-            <td>R$ 3.485,00</td>
-        </tr>
-    </table>
+    <!-- Categoria: Praia -->
+    <div class="categoria-box">
+        <h3>🌴 Itens para usar na praia</h3>
+        <div class="item-row"><input type="checkbox" data-key="praia_oculos"> Óculos de sol</div>
+        <div class="item-row"><input type="checkbox" data-key="praia_chapeu"> Chapéu / Boné</div>
+        <div class="item-row"><input type="checkbox" data-key="praia_chinelo"> Chinelo</div>
+        <div class="item-row"><input type="checkbox" data-key="praia_cooler"> Cooler</div>
+        <div class="item-row"><input type="checkbox" data-key="praia_caixa"> Caixa térmica</div>
+        <div class="item-row"><input type="checkbox" data-key="praia_lanche"> Lanches / frutas</div>
+        <div class="item-row"><input type="checkbox" data-key="praia_agua"> Água / bebidas</div>
+    </div>
 
-    <!-- Coluna lateral -->
-    <div class="colunas">
+    <!-- Categoria: Pets -->
+    <div class="categoria-box">
+        <h3>🐾 Pets</h3>
+        <div class="item-row"><input type="checkbox" data-key="pets_racao"> Ração</div>
+        <div class="item-row"><input type="checkbox" data-key="pets_potinho"> Potinho de comida</div>
+        <div class="item-row"><input type="checkbox" data-key="pets_brinquedo"> Brinquedo</div>
+        <div class="item-row"><input type="checkbox" data-key="pets_tapete"> Tapetinho higiênico</div>
+        <div class="item-row"><input type="checkbox" data-key="pets_guia"> Coleira / guia</div>
+    </div>
 
-        <div>
-            <div class="rendas-box">
-                <h3>Rendas</h3>
-                <div class="renda-item">Renda 1: <strong>R$ 1320,00</strong></div>
-                <div class="renda-item">Renda 2: <strong>R$ 1055,00</strong></div>
-                <div class="renda-item">Renda 3: <strong>R$ 830,00</strong></div>
-                <div class="renda-item">Renda 4: <strong>R$ 280,00</strong></div>
-            </div>
+    <!-- Orçamento, contador e checklist extra -->
+    <div class="orcamento">
+        <h2 class="mb-3">Orçamento da Viagem</h2>
 
-            <div class="frase">"A prosperidade começa na mente. Cultive pensamentos positivos e veja sua realidade se transformar."</div>
-            <div class="frase">"Sou merecedora de toda a abundância que o universo tem para me oferecer."</div>
-            <div class="frase">"A prosperidade flui livremente em minha vida com leveza."</div>
+        <div class="gastos mb-3">
+            <p><strong>Comida:</strong> <span data-value="200">R$ 200,00</span></p>
+            <p><strong>Bebidas:</strong> <span data-value="210">R$ 210,00</span></p>
+            <p><strong>Verde:</strong> <span data-value="150">R$ 150,00</span></p>
+            <p><strong>Cuidados Pets:</strong> <span data-value="100">R$ 100,00</span></p>
+            <p><strong>Passagens:</strong> <span data-value="150">R$ 150,00</span></p>
+
+            <p class="mt-2 total-valor">Total: <span id="total">R$ 0,00</span></p>
         </div>
 
+        <hr>
+
+        <h2 class="mb-2">Contador para a Viagem</h2>
+        <p class="contador">Faltam <strong id="contador">--</strong> dias para a viagem! 🏖️</p>
+
+        <hr>
+
+        <h2 class="mb-2">Checklist extra</h2>
+        <ul class="checklist list-unstyled">
+            <li class="item-row"><input type="checkbox" data-key="extra_protetor"> Protetor solar (extra)</li>
+            <li class="item-row"><input type="checkbox" data-key="extra_roupas"> Roupas praia (extra)</li>
+            <li class="item-row"><input type="checkbox" data-key="extra_carregador"> Carregadores</li>
+            <li class="item-row"><input type="checkbox" data-key="extra_remedios"> Remédios</li>
+        </ul>
+    </div>
+
+    <div class="footer-frase">
+        "Viajar é colecionar memórias. Que sua ida à praia seja leve, tranquila e cheia de sol!" ☀️
     </div>
 
 </div>
 
-<!-- Bootstrap JS -->
+<!-- SCRIPTS: o script vem depois do conteúdo para garantir que os elementos existam -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // ========== CONTADOR DE DIAS ==========
+    (function contadorDias() {
+        // coloque aqui a data da viagem (ano, mês-1, dia) ou "YYYY-MM-DD"
+        const dataViagem = new Date("2025-12-26");
+        const hoje = new Date();
+        const diffMs = dataViagem.setHours(0,0,0,0) - hoje.setHours(0,0,0,0);
+        const diasRaw = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+        const contadorEl = document.getElementById("contador");
+
+        if (isNaN(diasRaw)) {
+            contadorEl.textContent = "—";
+        } else if (diasRaw > 0) {
+            contadorEl.textContent = diasRaw;
+        } else if (diasRaw === 0) {
+            contadorEl.textContent = "0 (hoje!)";
+        } else {
+            contadorEl.textContent = Math.abs(diasRaw) + " dias atrás";
+        }
+    })();
+
+    // ========== CALCULAR TOTAL DO ORÇAMENTO ==========
+    (function calcularTotal() {
+        const spans = document.querySelectorAll('.gastos [data-value]');
+        let total = 0;
+        spans.forEach(s => {
+            const val = parseFloat(s.getAttribute('data-value')) || 0;
+            total += val;
+        });
+
+        // formata para R$ 810,00 (pt-BR)
+        const totalEl = document.getElementById('total');
+        totalEl.textContent = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total);
+    })();
+
+    // ========== SALVAR E RECUPERAR CHECKBOXES (localStorage) ==========
+    (function salvarCheckboxes() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"][data-key]');
+        checkboxes.forEach(cb => {
+            const key = 'praia_' + cb.getAttribute('data-key');
+
+            // carregar estado salvo
+            const salvo = localStorage.getItem(key);
+            if (salvo === 'true') cb.checked = true;
+
+            // salvar quando mudar
+            cb.addEventListener('change', () => {
+                localStorage.setItem(key, cb.checked);
+            });
+        });
+    })();
+</script>
 
 </body>
 </html>

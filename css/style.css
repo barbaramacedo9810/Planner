@@ -26,3 +26,20 @@
 .custom-navbar .navbar-brand:hover {
     color: #000;
 }
+
+
+.orcamento {
+    background: #f8f8f8;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px auto;
+    max-width: 500px;
+}
+
+.gastos p, .checklist li {
+    font-size: 18px;
+}
+
+h2, h3 {
+    margin-top: 15px;
+}
