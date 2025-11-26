@@ -1,0 +1,28 @@
+/* Navbar Suave - Bege Off-White */
+.custom-navbar {
+    background: rgba(245, 238, 228, 0.90); /* bege elegante */
+    backdrop-filter: blur(8px);            /* leve blur para suavidade */
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.custom-navbar .nav-link {
+    font-weight: 500;
+    color: #6b6b6b;
+    display: flex;
+    align-items: center;
+    transition: 0.2s;
+}
+
+.custom-navbar .nav-link:hover {
+    color: #000;
+    transform: translateY(-2px);
+}
+
+.custom-navbar .navbar-brand {
+    font-weight: bold;
+    color: #444;
+}
+
+.custom-navbar .navbar-brand:hover {
+    color: #000;
+}
