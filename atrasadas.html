@@ -2,16 +2,43 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Planejamento Financeiro</title>
+    <title>Checklist – Praia</title>
 
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
         body {
             font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #bde7f6, #fdf6e3);
+            padding-top: 90px;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: white !important;
+            box-shadow: 0 2px 8px #0001;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: #5CAEE3 !important;
+        }
+
+        .nav-link {
+            font-size: 16px;
+            margin-left: 8px;
+            color: #555 !important;
+        }
+
+        .nav-link:hover {
+            color: #5CAEE3 !important;
+        }
+        body {
+            font-family: Arial, sans-serif;
             background: #fdfdfd;
-            padding-top: 80px; /* espaço para a navbar fixa */
+            padding-top: 80px;
         }
 
         .container {
@@ -28,19 +55,11 @@
             font-weight: bold;
         }
 
-        .mes {
+        .subtitulo {
             text-align: right;
             font-size: 20px;
             font-weight: bold;
-            color: #5CAEE3;
-        }
-
-        .box-totais {
-            margin-top: 10px;
-            border: 2px solid #000;
-            width: 260px;
-            padding: 10px;
-            font-size: 16px;
+            color: #d9534f;
         }
 
         table {
@@ -61,86 +80,58 @@
 
         .total {
             font-weight: bold;
-            background: #ffe7c6;
+            background: #ffe2e2;
         }
 
-        .rendas-box {
-            margin-top: 20px;
-            background: #ffe7c6;
+        .alert-box {
+            background: #ffe2e2;
+            border-left: 6px solid #d9534f;
             padding: 15px;
-            width: 250px;
-            border-radius: 8px;
-        }
-
-        .renda-item {
-            background: #ffedcd;
-            padding: 8px;
-            margin-bottom: 8px;
             border-radius: 6px;
-            border: 1px solid #0002;
-        }
-
-        .frase {
             margin-top: 20px;
-            background: #ffe7c6;
-            padding: 15px;
-            border-radius: 8px;
-            border: 2px solid #d2b08a;
-            font-size: 14px;
-            width: 250px;
-        }
-
-        .colunas {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 25px;
+            font-size: 15px;
         }
     </style>
 </head>
-
 <body>
 
-<!-- Navbar suave -->
-<nav class="navbar navbar-expand-lg navbar-light custom-navbar fixed-top shadow-sm">
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top">
     <div class="container-fluid">
 
         <a class="navbar-brand d-flex align-items-center" href="index.html">
-            <img src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons@master/icons/home.svg" width="22" style="margin-right:6px; opacity:0.8;">
+            <i class="bi bi-journal-check" style="font-size:22px; margin-right:6px;"></i>
             Planejamento
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="collapse navbar-collapse" id="menu">
             <ul class="navbar-nav ms-auto">
 
                 <li class="nav-item">
-                    <a class="nav-link" href="index.html">
-                        <img src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons@master/icons/home.svg" width="20" style="margin-right:5px; opacity:0.8;">
-                        Início
+                    <a class="nav-link active" href="index.html">
+                        <i class="bi bi-house-door"></i> Início
                     </a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link" href="planejamento.html">
-                        <img src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons@master/icons/cash.svg" width="20" style="margin-right:5px; opacity:0.8;">
-                        Planejamento
+                        <i class="bi bi-cash-stack"></i> Planejamento
                     </a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link" href="praia.html">
-                        <img src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons@master/icons/beach.svg" width="20" style="margin-right:5px; opacity:0.8;">
-                        Praia
+                        <i class="bi bi-sun"></i> Praia
                     </a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link" href="atrasadas.html">
-                        <img src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons@master/icons/alert-circle.svg" width="20" style="margin-right:5px; opacity:0.8;">
-                        Atrasadas
+                        <i class="bi bi-exclamation-triangle"></i> Atrasadas
                     </a>
                 </li>
 
@@ -149,70 +140,34 @@
     </div>
 </nav>
 
-
 <div class="container">
 
-    <h1>Planejamento Financeiro</h1>
-    <p class="mes">Mês: DEZEMBRO</p>
+    <h1>Contas Atrasadas</h1>
+    <p class="subtitulo">Pendências importantes</p>
 
-    <div class="box-totais">
-        <p>Total de Saída: <strong>R$ 2.840,00</strong></p>
-        <p>Praia: <strong>R$ 167,00</strong></p>
-        <p>Saldo Final: <strong>R$ 477,30</strong></p>
+    <div class="alert-box">
+        ⚠ Estas contas precisam ser priorizadas para evitar juros e novas dívidas.
     </div>
 
-    <!-- Tabela de Débitos -->
+    <!-- Tabela -->
     <table>
         <tr>
-            <th>Débitos</th>
+            <th>Conta</th>
             <th>Valor</th>
         </tr>
 
-        <tr><td class="left">Luz</td><td>R$ 300,00</td></tr>
-        <tr><td class="left">Cartão Babi</td><td>R$ 800,00</td></tr>
-        <tr><td class="left">Internet</td><td>R$ 120,00</td></tr>
-        <tr><td class="left">Ração Pets</td><td>R$ 300,00</td></tr>
-        <tr><td class="left">Netflix</td><td>R$ 22,90</td></tr>
-        <tr><td class="left">Disney</td><td>R$ 27,90</td></tr>
-        <tr><td class="left">Xbox</td><td>R$ 59,90</td></tr>
-        <tr><td class="left">Vô Nilson</td><td>R$ 150,00</td></tr>
-        <tr><td class="left">Soika</td><td>R$ 150,00</td></tr>
-        <tr><td class="left">Pai</td><td>R$ 50,00</td></tr>
-        <tr><td class="left">Tia</td><td>R$ 100,00</td></tr>
-        <tr><td class="left">Tio Nei</td><td>R$ 70,00</td></tr>
-        <tr><td class="left">Verde</td><td>R$ 180,00</td></tr>
-        <tr><td class="left">Faculdade Babi</td><td>R$ 600,00</td></tr>
-        <tr><td class="left">Mercado</td><td>R$ 600,00</td></tr>
-        <tr><td class="left">Carne</td><td>R$ 200,00</td></tr>
+        <tr><td class="left">Cartão de Crédito</td><td>R$ 0,00</td></tr>
+        <tr><td class="left">Empréstimo</td><td>R$ 0,00</td></tr>
+        <tr><td class="left">FIES</td><td>R$ 0,00</td></tr>
 
         <tr class="total">
             <td>Total</td>
-            <td>R$ 3.485,00</td>
+            <td>R$ 0,00</td>
         </tr>
     </table>
 
-    <!-- Coluna lateral -->
-    <div class="colunas">
-
-        <div>
-            <div class="rendas-box">
-                <h3>Rendas</h3>
-                <div class="renda-item">Renda 1: <strong>R$ 1320,00</strong></div>
-                <div class="renda-item">Renda 2: <strong>R$ 1055,00</strong></div>
-                <div class="renda-item">Renda 3: <strong>R$ 830,00</strong></div>
-                <div class="renda-item">Renda 4: <strong>R$ 280,00</strong></div>
-            </div>
-
-            <div class="frase">"A prosperidade começa na mente. Cultive pensamentos positivos e veja sua realidade se transformar."</div>
-            <div class="frase">"Sou merecedora de toda a abundância que o universo tem para me oferecer."</div>
-            <div class="frase">"A prosperidade flui livremente em minha vida com leveza."</div>
-        </div>
-
-    </div>
-
 </div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
