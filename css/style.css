@@ -1,23 +1,29 @@
-/* ------------------------- */
-/* NAVBAR SUAVE - BEGE       */
-/* ------------------------- */
+/* -------------------------------------------------- */
+/* GERAL                                               */
+/* -------------------------------------------------- */
+body {
+    background: #f4f8ff !important;
+    padding-top: 80px;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* CONTAINER PRINCIPAL */
+.main-wrapper {
+    max-width: 1150px;
+    margin: auto;
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 20px #0001;
+}
+
+/* -------------------------------------------------- */
+/* NAVBAR SUAVE                                        */
+/* -------------------------------------------------- */
 .custom-navbar {
     background: rgba(245, 238, 228, 0.90);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid rgba(0,0,0,0.05);
-}
-
-.custom-navbar .nav-link {
-    font-weight: 500;
-    color: #6b6b6b;
-    display: flex;
-    align-items: center;
-    transition: 0.2s;
-}
-
-.custom-navbar .nav-link:hover {
-    color: #000;
-    transform: translateY(-2px);
 }
 
 .custom-navbar .navbar-brand {
@@ -29,120 +35,127 @@
     color: #000;
 }
 
-/* ------------------------- */
-/* BODY                      */
-/* ------------------------- */
-body {
-    background: #f4f8ff !important;
-    padding-top: 80px;
-    font-family: Arial, sans-serif;
+.custom-navbar .nav-link {
+    font-weight: 500;
+    color: #6b6b6b;
+    transition: 0.2s;
 }
 
-/* Ajusta o container da tela de abertura */
-.hero-container {
-    margin-top: 70px; /* para não ficar atrás da navbar */
-    height: calc(100vh - 70px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    background-color: #e9fbff; /* opcional – só pra combinar com a sua imagem */
+.custom-navbar .nav-link:hover {
+    color: #000;
+    transform: translateY(-2px);
 }
 
-/* Ajusta a imagem para não espalhar para o lado direito */
-.hero-image {
-    width: 100%;
-    max-width: 480px; /* <<< AQUI É O MOTIVO DE RESOLVER! */
-    height: auto;
-    display: block;
-    margin-bottom: 25px;
+/* -------------------------------------------------- */
+/* TÍTULOS / TEXTO                                     */
+/* -------------------------------------------------- */
+h1 {
+    font-weight: bold;
+    font-size: 32px;
+    color: #4d4d4d;
 }
 
-/* Botão */
-.btn-enter {
-    font-size: 18px;
-    padding: 15px 25px;
+.mes {
+    font-size: 20px;
+    font-weight: bold;
+    color: #6AB6F5;
 }
 
-/* ------------------------- */
-/* ORÇAMENTO                 */
-/* ------------------------- */
-.orcamento {
-    background: #f8f8f8;
-    padding: 20px;
-    border-radius: 10px;
-    margin: 20px auto;
-    max-width: 500px;
-}
-
-.gastos p,
-.checklist li {
-    font-size: 18px;
-}
-
-h2, h3 {
-    margin-top: 15px;
-}
-
-/* Caixa de Resumo */
+/* -------------------------------------------------- */
+/* BOX AZUL — RESUMO                                   */
+/* -------------------------------------------------- */
 .resumo-box {
-    background: white;
-    border-left: 5px solid #5CAEE3;
-    padding: 15px;
-    border-radius: 8px;
+    background: #eef6ff;
+    padding: 18px;
+    border-radius: 10px;
+    border-left: 5px solid #6AB6F5;
+    font-size: 16px;
+    position: relative;
+    min-height: 240px;
+    overflow: visible;
 }
 
-/* ------------------------- */
-/* RENDAS                    */
-/* ------------------------- */
+.img-resumo-decor {
+    position: absolute;
+    bottom: -327px;
+    right: -490px;
+    width: 1250px;
+    pointer-events: none;
+}
+
+/* -------------------------------------------------- */
+/* TABELA                                              */
+/* -------------------------------------------------- */
+table {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+thead {
+    background: #bfe0ff !important;
+}
+
+table td, table th {
+    padding: 10px;
+}
+
+.table-warning {
+    background: #ffe8c8 !important;
+}
+
+/* -------------------------------------------------- */
+/* RENDAS                                              */
+/* -------------------------------------------------- */
 .renda-card {
-    background: #ffe7c6;
-    border: none;
-    border-radius: 8px;
+    background: #fff4dd;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px #0001;
 }
 
 .renda-item {
-    background: #fff4db;
-    padding: 8px;
-    margin-bottom: 6px;
-    border-radius: 6px;
+    background: #ffeccc;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
     border: 1px solid #0001;
 }
 
-/* ------------------------- */
-/* AFIRMAÇÕES                */
-/* ------------------------- */
-.affirmations-card {
-    background: #fdf7ff;
-    border: 1px solid #e9d9f5;
+/* -------------------------------------------------- */
+/* BOX ROSA — AFIRMAÇÕES                               */
+/* -------------------------------------------------- */
+.affirm-box {
+    border: 3px solid #d6698c;
+    background: #ffeff5;
+    padding: 20px;
     border-radius: 12px;
-    padding: 15px;
-    box-shadow: 0 4px 10px rgba(180, 150, 220, 0.15);
+    min-height: 520px;
+    box-shadow: 0 4px 10px #0001;
+    position: relative;
+    overflow: visible;
 }
 
 .affirm-title {
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: #7a5fa3;
+    font-weight: bold;
+    color: #d45782;
     margin-bottom: 15px;
-    text-align: center;
+    font-size: 20px;
 }
 
 .affirm-item {
-    background: #faf3ff;
-    border: 1px solid #e5d4f8;
-    border-radius: 10px;
-    padding: 10px 12px;
-    margin-bottom: 10px;
-    color: #5c4a7c;
-    font-size: 0.9rem;
-    line-height: 1.3rem;
-    box-shadow: 0 2px 5px rgba(150, 120, 200, 0.1);
-    transition: 0.2s ease;
+    background: #ffe3f0;
+    border-left: 4px solid #d45782;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 15px;
+    line-height: 1.4;
 }
 
-.affirm-item:hover {
-    background: #f2e7ff;
-    transform: translateY(-2px);
+.img-affirm-decor {
+    position: absolute;
+    bottom: -120px;
+    right: -210px;
+    width: 750px;
+    pointer-events: none;
 }
