@@ -1,7 +1,9 @@
-/* Navbar Suave - Bege Off-White */
+/* ------------------------- */
+/* NAVBAR SUAVE - BEGE       */
+/* ------------------------- */
 .custom-navbar {
-    background: rgba(245, 238, 228, 0.90); /* bege elegante */
-    backdrop-filter: blur(8px);            /* leve blur para suavidade */
+    background: rgba(245, 238, 228, 0.90);
+    backdrop-filter: blur(8px);
     border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
@@ -27,7 +29,45 @@
     color: #000;
 }
 
+/* ------------------------- */
+/* BODY                      */
+/* ------------------------- */
+body {
+    background: #f4f8ff !important;
+    padding-top: 80px;
+    font-family: Arial, sans-serif;
+}
 
+/* Ajusta o container da tela de abertura */
+.hero-container {
+    margin-top: 70px; /* para não ficar atrás da navbar */
+    height: calc(100vh - 70px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: #e9fbff; /* opcional – só pra combinar com a sua imagem */
+}
+
+/* Ajusta a imagem para não espalhar para o lado direito */
+.hero-image {
+    width: 100%;
+    max-width: 480px; /* <<< AQUI É O MOTIVO DE RESOLVER! */
+    height: auto;
+    display: block;
+    margin-bottom: 25px;
+}
+
+/* Botão */
+.btn-enter {
+    font-size: 18px;
+    padding: 15px 25px;
+}
+
+/* ------------------------- */
+/* ORÇAMENTO                 */
+/* ------------------------- */
 .orcamento {
     background: #f8f8f8;
     padding: 20px;
@@ -36,7 +76,8 @@
     max-width: 500px;
 }
 
-.gastos p, .checklist li {
+.gastos p,
+.checklist li {
     font-size: 18px;
 }
 
@@ -44,13 +85,7 @@ h2, h3 {
     margin-top: 15px;
 }
 
-body {
-    background: #f4f8ff;
-    padding-top: 80px;
-    font-family: Arial, sans-serif;
-}
-
-/* Caixa de resumo */
+/* Caixa de Resumo */
 .resumo-box {
     background: white;
     border-left: 5px solid #5CAEE3;
@@ -58,7 +93,9 @@ body {
     border-radius: 8px;
 }
 
-/* Rendas */
+/* ------------------------- */
+/* RENDAS                    */
+/* ------------------------- */
 .renda-card {
     background: #ffe7c6;
     border: none;
@@ -73,6 +110,9 @@ body {
     border: 1px solid #0001;
 }
 
+/* ------------------------- */
+/* AFIRMAÇÕES                */
+/* ------------------------- */
 .affirmations-card {
     background: #fdf7ff;
     border: 1px solid #e9d9f5;
@@ -106,4 +146,3 @@ body {
     background: #f2e7ff;
     transform: translateY(-2px);
 }
-

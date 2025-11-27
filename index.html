@@ -10,76 +10,39 @@
     <!-- Ícones Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f8ff; /* azul clarinho muito suave */
-            padding-top: 80px;
-        }
-
-        /* NAVBAR */
-        .navbar {
-            background: white !important;
-            box-shadow: 0 2px 8px #0001;
-        }
-
-        .navbar-brand {
-            font-weight: bold;
-            color: #5CAEE3 !important;
-        }
-
-        .nav-link {
-            font-size: 16px;
-            margin-left: 8px;
-            color: #555 !important;
-        }
-
-        .nav-link:hover {
-            color: #5CAEE3 !important;
-        }
-
-        /* HERO */
-        .hero-container {
-            height: calc(100vh - 100px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .hero-title {
-            font-size: 40px;
-            font-weight: bold;
-            color: #5CAEE3;
-            margin-bottom: 10px;
-        }
-
-        .hero-sub {
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 30px;
-        }
-
-        .btn-enter {
-            font-size: 18px;
-            padding: 12px 32px;
-            border-radius: 10px;
-            background: #5CAEE3;
-            border: none;
-        }
-
-        .btn-enter:hover {
-            background: #4aa0d6;
-        }
-    </style>
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
+
+<style>
+    .hero-container {
+        margin-top: 70px;
+        height: calc(100vh - 70px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background-color: #e9fbff;
+    }
+
+    .hero-image {
+        width: 100%;
+        max-width: 1400px;
+        display: block;
+        margin: 0 auto 20px auto;
+    }
+
+    .btn-enter {
+        font-size: 18px;
+        padding: 10px 25px;
+    }
+</style>
 
 <body>
 
 <!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg fixed-top">
+<nav class="navbar navbar-expand-lg fixed-top custom-navbar">
     <div class="container-fluid">
 
         <a class="navbar-brand d-flex align-items-center" href="index.html">
@@ -123,10 +86,12 @@
     </div>
 </nav>
 
+
 <!-- TELA DE ABERTURA -->
 <div class="hero-container">
-    <h1 class="hero-title">Bem-vinda ao seu Planejamento Financeiro</h1>
-    <p class="hero-sub">Organize suas metas, controle gastos e visualize sua prosperidade com leveza.</p>
+
+    <!-- SUA IMAGEM DE ABERTURA -->
+    <img src="img/herobanner.png" alt="Imagem de abertura" class="hero-image">
 
     <a href="planejamento.html" class="btn btn-primary btn-enter">
         Entrar na Agenda
