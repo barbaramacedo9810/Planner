@@ -11,8 +11,23 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom, #bde7f6, #fdf6e3);
+            background-image: url('img/fundopraia.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             padding-top: 90px;
+            position: relative;
+        }
+
+        /* camada semitransparente para melhorar leitura */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.55);
+            pointer-events: none;
+            z-index: -1;
         }
 
         /* NAVBAR */
@@ -247,13 +262,12 @@
 
 </div>
 
-<!-- SCRIPTS: o script vem depois do conteúdo para garantir que os elementos existam -->
+<!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
     // ========== CONTADOR DE DIAS ==========
     (function contadorDias() {
-        // coloque aqui a data da viagem (ano, mês-1, dia) ou "YYYY-MM-DD"
         const dataViagem = new Date("2025-12-26");
         const hoje = new Date();
         const diffMs = dataViagem.setHours(0,0,0,0) - hoje.setHours(0,0,0,0);
@@ -280,22 +294,21 @@
             total += val;
         });
 
-        // formata para R$ 810,00 (pt-BR)
         const totalEl = document.getElementById('total');
-        totalEl.textContent = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total);
+        totalEl.textContent = new Intl.NumberFormat('pt-BR',
+            { style: 'currency', currency: 'BRL' }
+        ).format(total);
     })();
 
-    // ========== SALVAR E RECUPERAR CHECKBOXES (localStorage) ==========
+    // ========== SALVAR CHECKBOXES ==========
     (function salvarCheckboxes() {
         const checkboxes = document.querySelectorAll('input[type="checkbox"][data-key]');
         checkboxes.forEach(cb => {
             const key = 'praia_' + cb.getAttribute('data-key');
 
-            // carregar estado salvo
             const salvo = localStorage.getItem(key);
             if (salvo === 'true') cb.checked = true;
 
-            // salvar quando mudar
             cb.addEventListener('change', () => {
                 localStorage.setItem(key, cb.checked);
             });
