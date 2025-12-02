@@ -131,7 +131,7 @@
 <body>
 
 <!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg fixed-top">
+<nav class="navbar navbar-expand-lg fixed-top custom-navbar bg-white shadow-sm">
     <div class="container-fluid">
 
         <a class="navbar-brand d-flex align-items-center" href="index.html">
@@ -159,7 +159,7 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link active" href="praia.html">
+                    <a class="nav-link" href="praia.html">
                         <i class="bi bi-sun"></i> Praia
                     </a>
                 </li>
@@ -170,8 +170,19 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a class="nav-link" href="calendario.html">
+                        <i class="bi bi-calendar3"></i> Calendário
+                    </a>
+                </li>
+
+                <li class="nav-item ms-3">
+                    <button id="logoutBtn" class="btn btn-danger btn-sm">Sair</button>
+                </li>
+
             </ul>
         </div>
+
     </div>
 </nav>
 
@@ -314,6 +325,34 @@
             });
         });
     })();
+</script>
+
+<!-- 🔐 PROTEÇÃO DE LOGIN + LOGOUT -->
+<script type="module">
+    import app from "./firebase.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const auth = getAuth(app);
+
+    // Se não estiver logado, volta para a tela de login
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = "login.html";
+        }
+    });
+
+    // Faz logout quando o botão for clicado
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", async () => {
+            try {
+                await signOut(auth);
+                // após logout o onAuthStateChanged tratará o redirecionamento
+            } catch (err) {
+                console.error("Erro ao deslogar:", err);
+            }
+        });
+    }
 </script>
 
 </body>
