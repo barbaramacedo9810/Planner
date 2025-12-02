@@ -97,7 +97,7 @@
                 <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house-door"></i> Início</a></li>
                 <li class="nav-item"><a class="nav-link" href="planejamento.html"><i class="bi bi-cash-stack"></i> Planejamento</a></li>
                 <li class="nav-item"><a class="nav-link" href="praia.html"><i class="bi bi-sun"></i> Praia</a></li>
-                <li class="nav-item"><a class="nav-link" href="atrasadas.html"><i class="bi bi-exclamation-triangle"></i> Atrasadas</a></li>
+                <li class="nav-item"><a class="nav-link active" href="atrasadas.html"><i class="bi bi-exclamation-triangle"></i> Atrasadas</a></li>
                 <li class="nav-item"><a class="nav-link" href="calendario.html"><i class="bi bi-calendar3"></i> Calendário</a></li>
 
             </ul>
@@ -124,7 +124,7 @@
                 <input id="valorConta" class="form-control" placeholder="Valor (ex: 150)">
             </div>
             <div class="col-2">
-                <button id="addContaBtn" class="btn btn-primary w-100">
+                <button id="addContaBtn" class="btn btn-primary w-100" disabled>
                     <i class="bi bi-plus-lg"></i>
                 </button>
             </div>
@@ -192,8 +192,11 @@
 
         usuarioId = user.uid;
 
-        // 🔥 Caminho certo conforme suas regras:
+        // Caminho correto:
         COL = collection(db, "usuarios", usuarioId, "atrasadas");
+
+        // Agora o botão pode ser usado
+        document.getElementById("addContaBtn").disabled = false;
 
         carregarFirebase();
     });
