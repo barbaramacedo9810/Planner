@@ -158,29 +158,50 @@
 
 <!-- FIREBASE + SISTEMA -->
 <script type="module">
+
     /* ---------------- FIREBASE ---------------- */
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc }
-        from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import app from "./firebase.js";
+    import {
+        getAuth,
+        onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-    const firebaseConfig = {
-        apiKey: "SUA_API_KEY",
-        authDomain: "SEU_AUTH_DOMAIN",
-        projectId: "SEU_PROJECT_ID",
-        storageBucket: "SEU_STORAGE",
-        messagingSenderId: "SEU_MSG_ID",
-        appId: "SEU_APP_ID"
-    };
+    import {
+        getFirestore,
+        collection,
+        addDoc,
+        getDocs,
+        deleteDoc,
+        doc
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    const app = initializeApp(firebaseConfig);
+
+    const auth = getAuth(app);
     const db = getFirestore(app);
-    const COL = collection(db, "contas_atrasadas");
 
+    let usuarioId = null;
+    let COL = null;
     let listaContas = [];
+
+    /* --------- LOGIN + CARREGAR DADOS ---------- */
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        usuarioId = user.uid;
+
+        // 🔥 Caminho certo conforme suas regras:
+        COL = collection(db, "usuarios", usuarioId, "atrasadas");
+
+        carregarFirebase();
+    });
 
     /* ----------- BUSCAR DO FIREBASE ----------- */
     async function carregarFirebase() {
         listaContas = [];
+
         const snap = await getDocs(COL);
 
         snap.forEach(d => {
@@ -191,7 +212,6 @@
             });
         });
 
-        localStorage.setItem("contas_atrasadas", JSON.stringify(listaContas));
         renderTabela();
     }
 
@@ -202,7 +222,7 @@
 
     /* ----------- EXCLUIR NO FIREBASE ----------- */
     async function excluirFirebase(id) {
-        await deleteDoc(doc(db, "contas_atrasadas", id));
+        await deleteDoc(doc(db, "usuarios", usuarioId, "atrasadas", id));
     }
 
     /* ----------- ADICIONAR CONTA ----------- */
@@ -217,7 +237,10 @@
 
         let valor = parseFloat(valorRaw);
 
-        if (!nome || isNaN(valor)) return alert("Preencha os campos corretamente.");
+        if (!nome || isNaN(valor)) {
+            alert("Preencha os campos corretamente.");
+            return;
+        }
 
         const conta = { nome, valor };
 
@@ -234,9 +257,7 @@
 
         if (item.id) await excluirFirebase(item.id);
 
-        listaContas.splice(i, 1);
-        localStorage.setItem("contas_atrasadas", JSON.stringify(listaContas));
-        renderTabela();
+        await carregarFirebase();
     };
 
     /* ----------- RENDER TABELA ----------- */
@@ -266,8 +287,6 @@
             total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     }
 
-    /* ----------- INICIAR ----------- */
-    window.onload = carregarFirebase;
 </script>
 
 </body>
