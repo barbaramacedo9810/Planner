@@ -16,20 +16,27 @@
 
 <body>
 
-<!-- 🔐 PROTEÇÃO DE LOGIN -->
+<!-- 🔐 PROTEÇÃO DE LOGIN (colocada no topo) -->
 <script type="module">
-    import app from "./firebase.js";
-    import { getAuth, onAuthStateChanged }
-        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import app, { db } from "./firebase.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { collection, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const auth = getAuth(app);
 
+    // redireciona para login caso não esteja logado
     onAuthStateChanged(auth, (user) => {
         if (!user) {
             window.location.href = "login.html";
         }
     });
+
+    // Expondo alguns métodos para uso posterior caso queira (opcional)
+    window.__PLAN_AUTH = auth;
+    window.__PLAN_DB = db;
+    window.__PLAN_FS = { collection, getDocs, doc, getDoc, setDoc };
 </script>
+<!-- 🔐 FIM PROTEÇÃO -->
 
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg fixed-top custom-navbar bg-white shadow-sm">
@@ -92,7 +99,20 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1>Planejamento Financeiro</h1>
-        <p class="mes">Mês: <span class="text-primary fw-bold">DEZEMBRO</span></p>
+
+        <!-- seletor de mês + duplicar -->
+        <div class="d-flex align-items-center gap-2">
+            <label class="mb-0 me-1">Planejamento —</label>
+            <select id="monthSelect" class="form-select form-select-sm" style="width:220px;"></select>
+
+            <button id="newMonthBtn" class="btn btn-outline-secondary btn-sm" title="Criar mês vazio">
+                Novo mês
+            </button>
+
+            <button id="duplicateBtn" class="btn btn-outline-primary btn-sm" title="Duplicar mês anterior">
+                Duplicar
+            </button>
+        </div>
     </div>
 
     <!-- RESUMO -->
@@ -186,11 +206,48 @@
 <!-- ======================================================= -->
 <!-- SCRIPT COMPLETO - TUDO DINÂMICO                         -->
 <!-- ======================================================= -->
-<script>
-    /* --------------------------------------------- */
-    /*               D E B I T O S                   */
-    /* --------------------------------------------- */
+<script type="module">
+    import app, { db } from "./firebase.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import {
+        collection,
+        getDocs,
+        doc,
+        getDoc,
+        setDoc
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+    const auth = getAuth(app);
+
+    // ------------------ helpers de data/mês ------------------
+    const MONTH_NAMES = [
+        "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+        "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+    ];
+
+    function monthKeyFromDate(d) {
+        const y = d.getFullYear();
+        const m = (d.getMonth() + 1).toString().padStart(2,'0');
+        return `${y}-${m}`; // ex. 2025-12
+    }
+
+    function labelFromMonthKey(key) {
+        const [y,m] = key.split("-");
+        const idx = parseInt(m,10)-1;
+        return `${MONTH_NAMES[idx]} / ${y}`;
+    }
+
+    function prevMonthKey(key) {
+        const [y,m] = key.split("-");
+        let year = parseInt(y,10), month = parseInt(m,10);
+        month--;
+        if (month < 1) { month = 12; year--; }
+        return `${year}-${String(month).padStart(2,'0')}`;
+    }
+
+    // ------------------ estado local (UI) ------------------
+    // estrutura que será salva por mês:
+    // { debitos: [{nome,valor}], rendas: [{nome,valor}], updatedAt: "... (opcional)" }
     let debitos = [
         { nome: "Luz", valor: 300 },
         { nome: "Cartão", valor: 800 },
@@ -219,7 +276,26 @@
 
     const tabelaBody = document.querySelector("#tabelaDebitos tbody");
     const listaRendas = document.getElementById("rendasLista");
+    const monthSelect = document.getElementById("monthSelect");
+    const newMonthBtn = document.getElementById("newMonthBtn");
+    const duplicateBtn = document.getElementById("duplicateBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
 
+    // Firestore helpers
+    let usuarioId = null;
+    const PATH_PLANEJAMENTO = ["planejamento","meses"]; // under usuarios/{uid}/planejamento/meses/{docId}
+
+    function collectionRefForMonths(uid) {
+        // usuarios/{uid}/planejamento/meses
+        return collection(db, "usuarios", uid, ...PATH_PLANEJAMENTO);
+    }
+
+    function docRefForMonth(uid, monthKey) {
+        // usuarios/{uid}/planejamento/meses/{monthKey}
+        return doc(db, "usuarios", uid, ...PATH_PLANEJAMENTO, monthKey);
+    }
+
+    // ------------------ render functions ------------------
     function atualizarTabela() {
         tabelaBody.innerHTML = "";
 
@@ -227,47 +303,25 @@
             let tr = document.createElement("tr");
 
             tr.innerHTML = `
-            <td contenteditable="true" oninput="editarDebito(${index}, 'nome', this.innerText)">
+            <td contenteditable="true" oninput="window.__editarDebito(${index}, 'nome', this.innerText)">
                 ${item.nome}
             </td>
 
-            <td contenteditable="true" oninput="editarDebito(${index}, 'valor', this.innerText)">
-                ${item.valor.toFixed(2)}
+            <td contenteditable="true" oninput="window.__editarDebito(${index}, 'valor', this.innerText)">
+                ${Number(item.valor).toFixed(2)}
             </td>
 
             <td class="text-center">
-                <button class="btn btn-danger btn-sm" onclick="removerDebito(${index})">
+                <button class="btn btn-danger btn-sm" onclick="window.__removerDebito(${index})">
                     <i class="bi bi-trash"></i>
                 </button>
             </td>
         `;
-
             tabelaBody.appendChild(tr);
         });
 
         atualizarTotais();
     }
-
-    function editarDebito(i, campo, valor) {
-        if (campo === "valor") valor = valor.replace(",", ".");
-        if (campo === "valor") valor = parseFloat(valor) || 0;
-        debitos[i][campo] = valor;
-        atualizarTotais();
-    }
-
-    function removerDebito(index) {
-        debitos.splice(index, 1);
-        atualizarTabela();
-    }
-
-    document.getElementById("addDebitoBtn").onclick = () => {
-        debitos.push({ nome: "Novo Débito", valor: 0 });
-        atualizarTabela();
-    };
-
-    /* --------------------------------------------- */
-    /*                 R E N D A S                   */
-    /* --------------------------------------------- */
 
     function atualizarRendas() {
         listaRendas.innerHTML = "";
@@ -277,139 +331,331 @@
             div.classList.add("d-flex", "justify-content-between", "align-items-center", "mb-2");
 
             div.innerHTML = `
-            <div contenteditable="true" oninput="editarRenda(${index}, 'nome', this.innerText)">
+            <div contenteditable="true" oninput="window.__editarRenda(${index}, 'nome', this.innerText)">
                 ${item.nome}
             </div>
 
             <div class="d-flex align-items-center">
-                <span contenteditable="true" oninput="editarRenda(${index}, 'valor', this.innerText)">
-                    ${item.valor.toFixed(2)}
+                <span contenteditable="true" oninput="window.__editarRenda(${index}, 'valor', this.innerText)">
+                    ${Number(item.valor).toFixed(2)}
                 </span>
 
-                <button class="btn btn-danger btn-sm ms-2" onclick="removerRenda(${index})">
+                <button class="btn btn-danger btn-sm ms-2" onclick="window.__removerRenda(${index})">
                     <i class="bi bi-trash"></i>
                 </button>
             </div>
         `;
-
             listaRendas.appendChild(div);
         });
 
         atualizarTotais();
     }
 
-    function editarRenda(i, campo, valor) {
+    function atualizarTotais() {
+        let totalDebitos = debitos.reduce((t, d) => t + Number(d.valor || 0), 0);
+        let totalRenda = rendas.reduce((t, r) => t + Number(r.valor || 0), 0);
+        let saldo = totalRenda - totalDebitos;
+
+        document.getElementById("totalSaida").innerText = "R$ " + totalDebitos.toFixed(2).replace(".", ",");
+        document.getElementById("resumoSaida").innerText = "R$ " + totalDebitos.toFixed(2).replace(".", ",");
+        document.getElementById("totalRendas").innerText = "R$ " + totalRenda.toFixed(2).replace(".", ",");
+        document.getElementById("resumoRendas").innerText = "R$ " + totalRenda.toFixed(2).replace(".", ",");
+        document.getElementById("saldoFinal").innerText = "R$ " + saldo.toFixed(2).replace(".", ",");
+    }
+
+    // Expondo pequenos utilitários (usados nos contenteditable)
+    window.__editarDebito = function(i, campo, valor) {
+        if (campo === "valor") valor = valor.replace(",", ".");
+        if (campo === "valor") valor = parseFloat(valor) || 0;
+        debitos[i][campo] = valor;
+        marcarAlteracao();
+        atualizarTotais();
+    };
+    window.__removerDebito = function(i) {
+        debitos.splice(i,1);
+        marcarAlteracao();
+        atualizarTabela();
+    };
+    window.__editarRenda = function(i, campo, valor) {
         if (campo === "valor") valor = valor.replace(",", ".");
         if (campo === "valor") valor = parseFloat(valor) || 0;
         rendas[i][campo] = valor;
+        marcarAlteracao();
         atualizarTotais();
-    }
-
-    function removerRenda(index) {
-        rendas.splice(index, 1);
-        atualizarRendas();
-    }
-
-    document.getElementById("addRendaBtn").onclick = () => {
-        rendas.push({ nome: "Nova Renda", valor: 0 });
+    };
+    window.__removerRenda = function(i) {
+        rendas.splice(i,1);
+        marcarAlteracao();
         atualizarRendas();
     };
 
-    /* --------------------------------------------- */
-    /*            CÁLCULO DOS TOTAIS                 */
-    /* --------------------------------------------- */
+    document.getElementById("addDebitoBtn").onclick = () => {
+        debitos.push({ nome: "Novo Débito", valor: 0 });
+        marcarAlteracao();
+        atualizarTabela();
+    };
 
-    function atualizarTotais() {
-        let totalDebitos = debitos.reduce((t, d) => t + d.valor, 0);
-        let totalRenda = rendas.reduce((t, r) => t + r.valor, 0);
-        let saldo = totalRenda - totalDebitos;
+    document.getElementById("addRendaBtn").onclick = () => {
+        rendas.push({ nome: "Nova Renda", valor: 0 });
+        marcarAlteracao();
+        atualizarRendas();
+    };
 
-        document.getElementById("totalSaida").innerText =
-            "R$ " + totalDebitos.toFixed(2).replace(".", ",");
+    // ---------- month list & selection / CRUD ----------
+    let availableMonths = []; // array of monthKey strings
+    let currentMonthKey = null; // ex: "2025-12"
+    let autoSaveInterval = null;
+    let lastChangeTimestamp = 0;
 
-        document.getElementById("resumoSaida").innerText =
-            "R$ " + totalDebitos.toFixed(2).replace(".", ",");
-
-        document.getElementById("totalRendas").innerText =
-            "R$ " + totalRenda.toFixed(2).replace(".", ",");
-
-        document.getElementById("resumoRendas").innerText =
-            "R$ " + totalRenda.toFixed(2).replace(".", ",");
-
-        document.getElementById("saldoFinal").innerText =
-            "R$ " + saldo.toFixed(2).replace(".", ",");
+    function getCurrentMonthKeyDefault() {
+        return monthKeyFromDate(new Date());
     }
 
-    /* --------------------------------------------- */
-    /*   INICIAR TELA                                 */
-    /* --------------------------------------------- */
-    atualizarTabela();
-    atualizarRendas();
-</script>
+    async function listMonthsFromFirestore(uid) {
+        const col = collectionRefForMonths(uid);
+        const snap = await getDocs(col);
+        const months = [];
+        snap.forEach(d => months.push(d.id));
+        months.sort(); // lexicographic sorts ISO yyyy-mm correctly
+        return months;
+    }
 
-<!-- 🔥 FIREBASE – SALVAR E CARREGAR DADOS DO USUÁRIO -->
-<script type="module">
-    import app from "./firebase.js";
-    import {
-        getAuth,
-        onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    function populateMonthSelect() {
+        monthSelect.innerHTML = "";
+        // Add option to create arbitrary month using a "YYYY-MM" format input (we also have buttons)
+        availableMonths.forEach(key => {
+            const opt = document.createElement("option");
+            opt.value = key;
+            opt.textContent = labelFromMonthKey(key);
+            monthSelect.appendChild(opt);
+        });
 
-    import {
-        getFirestore,
-        doc,
-        setDoc,
-        getDoc
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        // if currentMonthKey not in availableMonths, add it as selectable (but not saved yet)
+        if (currentMonthKey && !availableMonths.includes(currentMonthKey)) {
+            const opt = document.createElement("option");
+            opt.value = currentMonthKey;
+            opt.textContent = labelFromMonthKey(currentMonthKey) + " (novo)";
+            opt.selected = true;
+            monthSelect.prepend(opt);
+        }
 
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+        // select currentMonthKey
+        if (currentMonthKey) {
+            monthSelect.value = currentMonthKey;
+        }
+    }
 
-    let usuarioId = null;
+    async function loadMonth(uid, monthKey) {
+        // load from firestore; if not exists, leave defaults (but clear if "new month empty" desired)
+        const ref = docRefForMonth(uid, monthKey);
+        const snap = await getDoc(ref);
+        if (!snap.exists()) {
+            // New month: Opção A — começa vazio
+            debitos = [];
+            rendas = [];
+        } else {
+            const data = snap.data();
+            debitos = Array.isArray(data.debitos) ? data.debitos : [];
+            rendas = Array.isArray(data.rendas) ? data.rendas : [];
+        }
 
+        currentMonthKey = monthKey;
+        // update UI label display in select
+        populateMonthSelect();
+        atualizarTabela();
+        atualizarRendas();
+
+        // ensure autosave is pointed to this doc (handled by autosave using currentMonthKey)
+        marcarAlteracao();
+    }
+
+    async function saveMonthToFirestore(uid, monthKey) {
+        if (!uid || !monthKey) return;
+        const payload = {
+            debitos,
+            rendas,
+            updatedAt: new Date().toISOString()
+        };
+        const ref = docRefForMonth(uid, monthKey);
+        await setDoc(ref, payload, { merge: true });
+        // refresh months list (if new created)
+        availableMonths = await listMonthsFromFirestore(uid);
+        populateMonthSelect();
+    }
+
+    // create a new month empty (and select it)
+    async function createNewMonth(uid, monthKey) {
+        // if monthKey omitted, open prompt for YYYY-MM
+        let mk = monthKey;
+        if (!mk) {
+            // default to next month
+            const d = new Date();
+            d.setMonth(d.getMonth() + 1);
+            mk = monthKeyFromDate(d);
+            const userInput = prompt("Informe o mês no formato YYYY-MM (ex: 2026-01) ou deixe:", mk);
+            if (!userInput) return null;
+            // basic validation
+            if (!/^\d{4}-\d{2}$/.test(userInput)) {
+                alert("Formato inválido. Use YYYY-MM.");
+                return null;
+            }
+            mk = userInput;
+        }
+
+        // create empty doc
+        debitos = [];
+        rendas = [];
+        currentMonthKey = mk;
+        await saveMonthToFirestore(uid, mk);
+        populateMonthSelect();
+        atualizarTabela();
+        atualizarRendas();
+        return mk;
+    }
+
+    // duplicate previous month into the currently selected month (overwrites current)
+    async function duplicatePreviousMonth(uid, targetMonthKey) {
+        if (!targetMonthKey) {
+            alert("Selecione primeiro o mês de destino no seletor.");
+            return;
+        }
+        const sourceKey = prevMonthKey(targetMonthKey);
+        // get source doc
+        const srcRef = docRefForMonth(uid, sourceKey);
+        const srcSnap = await getDoc(srcRef);
+        if (!srcSnap.exists()) {
+            alert(`Não foi encontrado mês anterior (${labelFromMonthKey(sourceKey)}) para duplicar.`);
+            return;
+        }
+        const data = srcSnap.data();
+        debitos = Array.isArray(data.debitos) ? JSON.parse(JSON.stringify(data.debitos)) : [];
+        rendas = Array.isArray(data.rendas) ? JSON.parse(JSON.stringify(data.rendas)) : [];
+        currentMonthKey = targetMonthKey;
+        await saveMonthToFirestore(uid, targetMonthKey);
+        populateMonthSelect();
+        atualizarTabela();
+        atualizarRendas();
+        alert(`Mês ${labelFromMonthKey(sourceKey)} duplicado para ${labelFromMonthKey(targetMonthKey)}.`);
+    }
+
+    // mark that the UI changed (used to trigger autosave)
+    function marcarAlteracao() {
+        lastChangeTimestamp = Date.now();
+    }
+
+    // autosave loop (1s), saves to current selected month if user logged
+    function startAutoSaveLoop() {
+        if (autoSaveInterval) clearInterval(autoSaveInterval);
+        autoSaveInterval = setInterval(async () => {
+            // if no recent changes, skip to reduce writes (but still periodically)
+            // We'll save if lastChangeTimestamp within last 2 seconds OR every 10 seconds forced.
+            const now = Date.now();
+            if (!usuarioId || !currentMonthKey) return;
+            const changedRecently = (now - lastChangeTimestamp) < 2000;
+            const saveAnyway = (now % 10000) < 1000; // rough every ~10s
+            if (!changedRecently && !saveAnyway) return;
+            try {
+                await saveMonthToFirestore(usuarioId, currentMonthKey);
+                // clear lastChangeTimestamp to avoid continuous saves
+                lastChangeTimestamp = 0;
+            } catch (e) {
+                console.error("Erro auto-salvando:", e);
+            }
+        }, 1000);
+    }
+
+    // ------------------ auth + initialization ------------------
     onAuthStateChanged(auth, async (user) => {
-
         if (!user) {
-            window.location.href = "login.html";
+            // redirect is handled earlier, but keep safety
             return;
         }
 
+        // store uid for later operations
         usuarioId = user.uid;
 
-        /*
-           NOVO CAMINHO CERTO:
-           usuarios/{uid}/planejamento/dados
-        */
-        const ref = doc(db, "usuarios", usuarioId, "planejamento", "dados");
-        const snap = await getDoc(ref);
+        // populate months list
+        availableMonths = await listMonthsFromFirestore(usuarioId);
 
-        if (snap.exists()) {
-            const dados = snap.data();
+        // default selection: current month
+        const defaultKey = getCurrentMonthKeyDefault();
 
-            if (dados.debitos) debitos = dados.debitos;
-            if (dados.rendas) rendas = dados.rendas;
+        // if there are no months yet, create a doc for current month as "novo" (but per Opção A, we prefer empty)
+        // We'll not auto-create doc, only select it in UI and allow user to save.
+        currentMonthKey = defaultKey;
 
+        populateMonthSelect();
+
+        // If current month exists in Firestore, load it, else leave empty or load existing page values?
+        // Per your choice (Opção A): new month starts empty — so load from Firestore only if exists.
+        if (availableMonths.includes(currentMonthKey)) {
+            await loadMonth(usuarioId, currentMonthKey);
+        } else {
+            // start empty (Opção A)
+            debitos = [];
+            rendas = [];
             atualizarTabela();
             atualizarRendas();
+            populateMonthSelect();
         }
 
-        ativarAutoSave(ref);
+        startAutoSaveLoop();
     });
 
-    /* AUTO-SALVAR */
-    function ativarAutoSave(ref) {
+    // select change
+    monthSelect.addEventListener("change", async (e) => {
+        const mk = monthSelect.value;
+        if (!mk) return;
+        await loadMonth(usuarioId, mk);
+    });
 
-        setInterval(() => {
+    // new month button
+    newMonthBtn.addEventListener("click", async () => {
+        // create empty month and select it
+        const mk = await createNewMonth(usuarioId);
+        if (mk) {
+            alert(`Mês ${labelFromMonthKey(mk)} criado (vazio).`);
+        }
+    });
 
-            setDoc(ref, {
-                debitos: debitos,
-                rendas: rendas
-            }, { merge: true });
+    // duplicate button
+    duplicateBtn.addEventListener("click", async () => {
+        // ask user for target month (default to currentMonthKey)
+        const defaultTarget = currentMonthKey || getCurrentMonthKeyDefault();
+        const userInput = prompt("Informe o mês destino (YYYY-MM) para duplicar o mês anterior para ele:", defaultTarget);
+        if (!userInput) return;
+        if (!/^\d{4}-\d{2}$/.test(userInput)) {
+            alert("Formato inválido. Use YYYY-MM.");
+            return;
+        }
+        await duplicatePreviousMonth(usuarioId, userInput);
+    });
 
-        }, 1000);
+    // logout behavior (keep)
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", async () => {
+            try {
+                await signOut(auth);
+                window.location.href = "login.html";
+            } catch (e) {
+                console.error("Erro logout:", e);
+            }
+        });
     }
-</script>
 
+    // inicial render com dados atuais
+    atualizarTabela();
+    atualizarRendas();
+
+    // marca alteração sempre que o usuário faz algo (safeguard)
+    // contenteditable handlers already call marcarAlteracao via __editarDebito/__editarRenda
+    // also observe DOM changes like adding/removing
+    const originalAddDebito = document.getElementById("addDebitoBtn").onclick;
+    document.getElementById("addDebitoBtn").onclick = function() { originalAddDebito(); marcarAlteracao(); };
+    const originalAddRenda = document.getElementById("addRendaBtn").onclick;
+    document.getElementById("addRendaBtn").onclick = function() { originalAddRenda(); marcarAlteracao(); };
+
+</script>
 
 </body>
 </html>
