@@ -367,9 +367,6 @@
 
     let usuarioId = null;
 
-    /* -------------------------------------------------- */
-    /*      QUANDO O USUÁRIO LOGAR, CARREGAR DADOS        */
-    /* -------------------------------------------------- */
     onAuthStateChanged(auth, async (user) => {
 
         if (!user) {
@@ -379,13 +376,16 @@
 
         usuarioId = user.uid;
 
-        const ref = doc(db, "planejamento", usuarioId);
+        /*
+           NOVO CAMINHO CERTO:
+           usuarios/{uid}/planejamento/dados
+        */
+        const ref = doc(db, "usuarios", usuarioId, "planejamento", "dados");
         const snap = await getDoc(ref);
 
         if (snap.exists()) {
             const dados = snap.data();
 
-            // 🔹 Só substituímos SE existirem no Firestore
             if (dados.debitos) debitos = dados.debitos;
             if (dados.rendas) rendas = dados.rendas;
 
@@ -393,21 +393,13 @@
             atualizarRendas();
         }
 
-        // Sempre que editar, salvar no banco
-        ativarAutoSave();
+        ativarAutoSave(ref);
     });
 
-    /* -------------------------------------------------- */
-    /*                   AUTO-SALVAMENTO                  */
-    /* -------------------------------------------------- */
+    /* AUTO-SALVAR */
+    function ativarAutoSave(ref) {
 
-    function ativarAutoSave() {
-
-        // Salva 1x por segundo (evita spam no Firestore)
         setInterval(() => {
-            if (!usuarioId) return;
-
-            const ref = doc(db, "planejamento", usuarioId);
 
             setDoc(ref, {
                 debitos: debitos,
@@ -417,6 +409,7 @@
         }, 1000);
     }
 </script>
+
 
 </body>
 </html>
