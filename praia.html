@@ -22,7 +22,6 @@
             position: relative;
         }
 
-        /* camada semitransparente para melhorar leitura */
         body::before {
             content: "";
             position: fixed;
@@ -32,7 +31,6 @@
             z-index: -1;
         }
 
-        /* NAVBAR */
         .navbar {
             background: white !important;
             box-shadow: 0 2px 8px #0001;
@@ -110,7 +108,6 @@
             text-align: right;
         }
 
-        /* Orçamento */
         .orcamento {
             background: #fff;
             border-radius: 8px;
@@ -146,7 +143,6 @@
             text-align: center;
         }
 
-        /* Post-it style (anotações) */
         .notas-card {
             width: 260px;
             min-height: 220px;
@@ -187,12 +183,10 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.15);
         }
 
-        /* responsive adjustments */
         @media (max-width: 980px) {
             .container-praia { padding: 18px; margin-top: 0; }
             .categoria-box h3 { font-size: 18px; flex-direction:column; align-items:flex-start; gap:8px; }
             .item-actions { min-width: 56px; }
-            /* notas drop under orcamento on small */
             .orcamento-flex { flex-direction: column; gap: 12px; }
             .notas-card { width: 100%; min-height: 140px; }
         }
@@ -201,10 +195,90 @@
 
 <body>
 
+<!-- 🔐 LOGIN PROTEGIDO (SEM DUPLICAÇÕES) -->
+<script type="module">
+    import app from "./firebase.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import {
+        getFirestore,
+        doc,
+        setDoc,
+        getDoc,
+        onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let isApplyingRemote = false;
+    let userPraiaDocRef = null;
+
+    const _localSave = window.saveState;
+
+    window.saveState = async function () {
+        try { _localSave(); } catch(e){}
+        if (isApplyingRemote) return;
+
+        if (userPraiaDocRef) {
+            try {
+                const payload = JSON.parse(JSON.stringify(window.state));
+                await setDoc(userPraiaDocRef, payload, { merge: true });
+            } catch(e){}
+        }
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        const uid = user.uid;
+        userPraiaDocRef = doc(db, "usuarios", uid, "praia", "state");
+
+        try {
+            const snap = await getDoc(userPraiaDocRef);
+            const importedKey = "praia_imported_v1";
+            const localRaw = localStorage.getItem("praia_state_v1");
+
+            if (!snap.exists() && localRaw && !localStorage.getItem(importedKey)) {
+                await setDoc(userPraiaDocRef, JSON.parse(localRaw));
+                localStorage.setItem(importedKey, "1");
+            }
+
+            onSnapshot(userPraiaDocRef, (docSnap) => {
+                if (!docSnap.exists()) return;
+
+                const remote = docSnap.data();
+                try {
+                    const local = JSON.parse(localStorage.getItem("praia_state_v1") || "{}");
+                    if (JSON.stringify(local) === JSON.stringify(remote)) return;
+                } catch(e){}
+
+                isApplyingRemote = true;
+                try {
+                    window.state = Object.assign({}, window.state, remote);
+                    localStorage.setItem("praia_state_v1", JSON.stringify(window.state));
+                    if (window.renderAll) window.renderAll();
+                } finally {
+                    setTimeout(() => isApplyingRemote = false, 200);
+                }
+            });
+        } catch(e){}
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const logoutBtn = document.getElementById("logoutBtn");
+        if (logoutBtn) {
+            logoutBtn.addEventListener("click", () => signOut(auth));
+        }
+    });
+</script>
+<!-- 🔐 FIM LOGIN -->
+
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg fixed-top custom-navbar bg-white shadow-sm">
     <div class="container-fluid">
-
         <a class="navbar-brand d-flex align-items-center" href="index.html">
             <i class="bi bi-journal-check" style="font-size:22px; margin-right:6px;"></i>
             Planejamento
@@ -216,7 +290,6 @@
 
         <div class="collapse navbar-collapse" id="menu">
             <ul class="navbar-nav ms-auto">
-
                 <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house-door"></i> Início</a></li>
                 <li class="nav-item"><a class="nav-link" href="planejamento.html"><i class="bi bi-cash-stack"></i> Planejamento</a></li>
                 <li class="nav-item"><a class="nav-link active" href="praia.html"><i class="bi bi-sun"></i> Praia</a></li>
@@ -226,10 +299,8 @@
                 <li class="nav-item ms-3">
                     <button id="logoutBtn" class="btn btn-danger btn-sm">Sair</button>
                 </li>
-
             </ul>
         </div>
-
     </div>
 </nav>
 
@@ -256,9 +327,7 @@
                 </div>
             </h3>
 
-            <div id="roupas-list" class="categoria-list">
-                <!-- items renderizados via JS -->
-            </div>
+            <div id="roupas-list" class="categoria-list"></div>
         </div>
 
         <!-- Utensílios -->
@@ -314,7 +383,7 @@
 
     </div>
 
-    <!-- Orçamento, contador e checklist extra (com bloco de notas ao lado) -->
+    <!-- Orçamento + contador + extras + bloco de notas -->
     <div class="orcamento">
         <div class="d-flex justify-content-between align-items-center">
             <h2 class="mb-3">Orçamento da Viagem</h2>
@@ -325,13 +394,11 @@
             </div>
         </div>
 
-        <!-- FLEX: left = orçamento + contador + extras / right = notas -->
         <div class="d-flex orcamento-flex" style="gap:20px; align-items:flex-start;">
 
+            <!-- COLUNA 1 -->
             <div style="flex:1; min-width:280px;">
-                <div id="orcamento-list" class="gastos mb-3">
-                    <!-- renderizado dinamicamente -->
-                </div>
+                <div id="orcamento-list" class="gastos mb-3"></div>
 
                 <p class="mt-2 total-valor">Total: <span id="total">R$ 0,00</span></p>
 
@@ -340,9 +407,10 @@
                 <div class="d-flex align-items-center gap-3 mb-2">
                     <h2 class="mb-0">Contador para a Viagem</h2>
                     <div>
-                        <input id="tripDate" type="date" class="form-control form-control-sm" style="display:inline-block; width:auto;">
+                        <input id="tripDate" type="date" class="form-control form-control-sm">
                     </div>
                 </div>
+
                 <p class="contador">Faltam <strong id="contador">--</strong> dias para a viagem! 🏖️</p>
 
                 <hr>
@@ -352,19 +420,19 @@
                     <input id="extraInput" class="form-control form-control-sm" placeholder="Adicionar item extra...">
                     <button id="addExtraBtn" class="btn btn-sm btn-primary"><i class="bi bi-plus"></i></button>
                 </div>
+
                 <ul class="checklist list-unstyled" id="extra-list"></ul>
             </div>
 
-            <!-- NOTAS (post-it style) -->
+            <!-- BLOCO DE NOTAS -->
             <div class="notas-card" aria-label="Anotações da viagem">
-                <div class="pin" title="Anotações"></div>
-                <h4><i class="bi bi-stickies me-1"></i> Anotações</h4>
+                <div class="pin"></div>
+                <h4><i class="bi bi-stickies"></i> Anotações</h4>
                 <textarea id="notasText" placeholder="Adicionar observações, lembretes ou informações importantes..."></textarea>
                 <p style="font-size:12px; color:#6b4f00; margin-top:8px;">Salvando automaticamente — sincronizado com o Firebase</p>
             </div>
 
         </div>
-
     </div>
 
     <div class="footer-frase">
@@ -373,24 +441,11 @@
 
 </div>
 
-<!-- SCRIPTS -->
+<!-- JS Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- LÓGICA DA PÁGINA -->
 <script>
-    /*
-      Praia page - dynamic checklist + budget + countdown
-      Data persisted to localStorage under key "praia_state_v1" (fallback) and synchronized with Firestore when logged in.
-
-      Structure kept locally (e usado para upload/import inicial):
-      {
-        tripDate: "2025-12-26",
-        categorias: { roupas: [...], utensilios: [...], cuidados: [...], praia: [...] },
-        extras: [...],
-        orcamento: [...],
-        notas: "texto..."
-      }
-    */
-
     const STORAGE_KEY = "praia_state_v1";
 
     const defaultState = {
@@ -446,44 +501,42 @@
         notas: ""
     };
 
-    // ---------- helpers ----------
+    // Helpers
     function genId() {
-        return 'id' + Math.random().toString(36).slice(2,9);
+        return "id" + Math.random().toString(36).substr(2, 9);
     }
 
+    function formatBRL(v) {
+        return Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    }
+
+    function escapeHtml(str) {
+        if (!str) return "";
+        return str.replace(/[&<>"']/g, s => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        }[s]));
+    }
+
+    // Estado
+    let state = loadState();
     function loadState() {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return JSON.parse(JSON.stringify(defaultState));
-        try {
-            return JSON.parse(raw);
-        } catch(e) {
-            console.error("Erro lendo localStorage:", e);
-            return JSON.parse(JSON.stringify(defaultState));
-        }
+        try { return JSON.parse(raw); }
+        catch { return JSON.parse(JSON.stringify(defaultState)); }
     }
 
-    // save local only (keeps API stable for other callbacks).
     function saveLocalState() {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        } catch(e) {
-            console.error("Erro salvando estado local:", e);
-        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
 
-    // we'll override global saveState later to sync with Firestore
     window.saveState = saveLocalState;
 
-    function formatBRL(v) {
-        return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    }
-
-    // ---------- state ----------
-    let state = loadState();
-
-    // ---------- rendering ----------
-    const categories = Object.keys(state.categorias);
-
+    // Renderização
     function renderAll() {
         renderCategorias();
         renderExtras();
@@ -493,146 +546,132 @@
         updateTotalsAndCounter();
     }
 
+    // Categorias
     function renderCategorias() {
-        categories.forEach(cat => {
+        Object.keys(state.categorias).forEach(cat => {
             const container = document.getElementById(cat + "-list");
-            if (!container) return;
             container.innerHTML = "";
 
             state.categorias[cat].forEach(item => {
                 const row = document.createElement("div");
                 row.className = "item-row";
-                row.dataset.id = item.id;
 
                 row.innerHTML = `
-                <div class="item-left">
-                    <input type="checkbox" class="me-2 item-checkbox" ${item.checked ? "checked": ""}>
-                    <div contenteditable="true" class="item-text">${escapeHtml(item.text)}</div>
-                </div>
+                    <div class="item-left">
+                        <input type="checkbox" ${item.checked ? "checked" : ""}>
+                        <div contenteditable="true" class="item-text">${escapeHtml(item.text)}</div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger btn-delete-item">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                `;
 
-                <div class="item-actions">
-                    <button class="btn btn-sm btn-outline-danger btn-delete-item"><i class="bi bi-trash"></i></button>
-                </div>
-            `;
                 container.appendChild(row);
 
-                // events
-                const checkbox = row.querySelector(".item-checkbox");
-                checkbox.addEventListener("change", (e) => {
-                    item.checked = checkbox.checked;
+                row.querySelector("input").addEventListener("change", () => {
+                    item.checked = !item.checked;
                     saveState();
                 });
 
-                const textDiv = row.querySelector(".item-text");
-                textDiv.addEventListener("input", () => {
-                    item.text = textDiv.innerText.trim();
+                row.querySelector(".item-text").addEventListener("input", e => {
+                    item.text = e.target.innerText.trim();
                     saveState();
                 });
 
                 row.querySelector(".btn-delete-item").addEventListener("click", () => {
-                    const idx = state.categorias[cat].findIndex(x => x.id === item.id);
-                    if (idx > -1) {
-                        state.categorias[cat].splice(idx,1);
-                        saveState();
-                        renderCategorias();
-                    }
+                    state.categorias[cat] = state.categorias[cat].filter(x => x.id !== item.id);
+                    saveState();
+                    renderCategorias();
                 });
             });
         });
     }
 
+    // Extras
     function renderExtras() {
-        const list = document.getElementById("extra-list");
-        if (!list) return;
-        list.innerHTML = "";
+        const container = document.getElementById("extra-list");
+        container.innerHTML = "";
 
         state.extras.forEach(item => {
             const li = document.createElement("li");
             li.className = "item-row";
-            li.innerHTML = `
-            <div class="item-left">
-                <input type="checkbox" class="me-2 extra-checkbox" ${item.checked ? "checked": ""}>
-                <div contenteditable="true" class="extra-text">${escapeHtml(item.text)}</div>
-            </div>
-            <div class="item-actions">
-                <button class="btn btn-sm btn-outline-danger btn-delete-extra"><i class="bi bi-trash"></i></button>
-            </div>
-        `;
-            list.appendChild(li);
 
-            li.querySelector(".extra-checkbox").addEventListener("change", () => {
-                item.checked = li.querySelector(".extra-checkbox").checked;
+            li.innerHTML = `
+                <div class="item-left">
+                    <input type="checkbox" ${item.checked ? "checked" : ""}>
+                    <div contenteditable="true" class="extra-text">${escapeHtml(item.text)}</div>
+                </div>
+                <button class="btn btn-sm btn-outline-danger btn-delete-extra">
+                    <i class="bi bi-trash"></i>
+                </button>
+            `;
+
+            container.appendChild(li);
+
+            li.querySelector("input").addEventListener("change", () => {
+                item.checked = !item.checked;
                 saveState();
             });
 
-            li.querySelector(".extra-text").addEventListener("input", () => {
-                item.text = li.querySelector(".extra-text").innerText.trim();
+            li.querySelector(".extra-text").addEventListener("input", e => {
+                item.text = e.target.innerText.trim();
                 saveState();
             });
 
             li.querySelector(".btn-delete-extra").addEventListener("click", () => {
-                const idx = state.extras.findIndex(x => x.id === item.id);
-                if (idx > -1) {
-                    state.extras.splice(idx,1);
-                    saveState();
-                    renderExtras();
-                }
+                state.extras = state.extras.filter(x => x.id !== item.id);
+                saveState();
+                renderExtras();
             });
         });
     }
 
+    // Orçamento
     function renderOrcamento() {
         const wrap = document.getElementById("orcamento-list");
-        if (!wrap) return;
         wrap.innerHTML = "";
 
         state.orcamento.forEach(item => {
             const row = document.createElement("div");
             row.className = "d-flex justify-content-between align-items-center mb-2";
-            row.dataset.id = item.id;
 
             row.innerHTML = `
-            <div class="me-3" style="flex:1;">
-                <input class="form-control form-control-sm orc-label" value="${escapeHtml(item.label)}" />
-            </div>
-            <div style="width:140px; display:flex; gap:8px; align-items:center;">
-                <input type="number" min="0" step="0.01" class="form-control form-control-sm orc-value" value="${Number(item.value).toFixed(2)}" />
-                <button class="btn btn-sm btn-outline-danger btn-delete-orc"><i class="bi bi-trash"></i></button>
-            </div>
-        `;
+                <input class="form-control form-control-sm orc-label" style="flex:1" value="${escapeHtml(item.label)}">
+                <input type="number" class="form-control form-control-sm orc-value"
+                       style="width:120px; margin-left:8px" value="${item.value}">
+                <button class="btn btn-sm btn-outline-danger ms-2 btn-delete-orc">
+                    <i class="bi bi-trash"></i>
+                </button>
+            `;
 
             wrap.appendChild(row);
 
-            const labelInp = row.querySelector(".orc-label");
-            const valueInp = row.querySelector(".orc-value");
-            labelInp.addEventListener("input", () => {
-                item.label = labelInp.value.trim();
+            row.querySelector(".orc-label").addEventListener("input", e => {
+                item.label = e.target.value;
                 saveState();
-                renderOrcamento(); // update maybe label changes
             });
-            valueInp.addEventListener("input", () => {
-                item.value = parseFloat(valueInp.value) || 0;
+
+            row.querySelector(".orc-value").addEventListener("input", e => {
+                item.value = parseFloat(e.target.value) || 0;
                 saveState();
                 updateTotalsAndCounter();
             });
+
             row.querySelector(".btn-delete-orc").addEventListener("click", () => {
-                const idx = state.orcamento.findIndex(x => x.id === item.id);
-                if (idx > -1) {
-                    state.orcamento.splice(idx,1);
-                    saveState();
-                    renderOrcamento();
-                    updateTotalsAndCounter();
-                }
+                state.orcamento = state.orcamento.filter(x => x.id !== item.id);
+                saveState();
+                renderOrcamento();
+                updateTotalsAndCounter();
             });
         });
 
         updateTotalsAndCounter();
     }
 
+    // Trip date
     function renderTripDate() {
         const inp = document.getElementById("tripDate");
-        if (!inp) return;
-        inp.value = state.tripDate || "";
+        inp.value = state.tripDate;
         inp.addEventListener("change", () => {
             state.tripDate = inp.value;
             saveState();
@@ -640,268 +679,65 @@
         });
     }
 
+    // Notas
     function renderNotas() {
         const ta = document.getElementById("notasText");
-        if (!ta) return;
-        ta.value = state.notas || "";
+        ta.value = state.notas;
+        ta.addEventListener("input", () => {
+            state.notas = ta.value;
+            saveState();
+        });
     }
 
+    // Totais
     function updateTotalsAndCounter() {
-        // orçamento total
-        const total = state.orcamento.reduce((s,i) => s + Number(i.value || 0), 0);
-        const totalEl = document.getElementById("total");
-        if (totalEl) totalEl.innerText = formatBRL(total);
+        const total = state.orcamento.reduce((s, i) => s + i.value, 0);
+        document.getElementById("total").innerText = formatBRL(total);
 
-        // contador
-        const contadorEl = document.getElementById("contador");
-        const trip = state.tripDate ? new Date(state.tripDate) : null;
-        if (!contadorEl) return;
-        if (!trip || isNaN(trip.getTime())) {
-            contadorEl.innerText = "—";
-        } else {
-            const hoje = new Date();
-            // normalize to midnight
-            trip.setHours(0,0,0,0);
-            hoje.setHours(0,0,0,0);
-            const diffMs = trip - hoje;
-            const diasRaw = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-            if (diasRaw > 0) contadorEl.innerText = diasRaw;
-            else if (diasRaw === 0) contadorEl.innerText = "0 (hoje!)";
-            else contadorEl.innerText = Math.abs(diasRaw) + " dias atrás";
-        }
+        const hoje = new Date();
+        const viagem = new Date(state.tripDate);
+
+        hoje.setHours(0,0,0,0);
+        viagem.setHours(0,0,0,0);
+
+        const diff = viagem - hoje;
+        const dias = Math.ceil(diff / (1000 * 60 * 60 * 24));
+
+        const el = document.getElementById("contador");
+        el.innerText = dias >= 0 ? dias : `${Math.abs(dias)} dias atrás`;
     }
 
-    // ---------- actions (DOM delegation) ----------
-    document.addEventListener("click", (e) => {
-        // add item buttons
-        if (e.target.closest(".btn-add-item")) {
-            const btn = e.target.closest(".btn-add-item");
-            const cat = btn.dataset.category;
-            const text = prompt("Nome do novo item:");
-            if (text && text.trim() !== "") {
-                state.categorias[cat].push({ id: genId(), text: text.trim(), checked: false });
+    // Botões
+    document.addEventListener("click", e => {
+        const addBtn = e.target.closest(".btn-add-item");
+        if (addBtn) {
+            const cat = addBtn.dataset.category;
+            const nome = prompt("Nome do item:");
+            if (nome) {
+                state.categorias[cat].push({ id: genId(), text: nome, checked: false });
                 saveState();
                 renderCategorias();
             }
         }
-
-        // collapse toggles
-        if (e.target.closest(".btn-collapse")) {
-            const btn = e.target.closest(".btn-collapse");
-            const target = btn.dataset.target;
-            const el = document.getElementById(target);
-            if (!el) return;
-            const showing = el.style.display !== "none";
-            el.style.display = showing ? "none" : "";
-            btn.querySelector("i").classList.toggle("bi-chevron-up", !showing);
-            btn.querySelector("i").classList.toggle("bi-chevron-down", showing);
-        }
     });
 
-    // add extra item
-    const addExtraBtn = document.getElementById("addExtraBtn");
-    if (addExtraBtn) {
-        addExtraBtn.addEventListener("click", () => {
-            const text = document.getElementById("extraInput").value.trim();
-            if (!text) return;
-            state.extras.push({ id: genId(), text, checked: false });
-            document.getElementById("extraInput").value = "";
-            saveState();
-            renderExtras();
-        });
-    }
+    document.getElementById("addExtraBtn").addEventListener("click", () => {
+        const text = document.getElementById("extraInput").value.trim();
+        if (!text) return;
+        state.extras.push({ id: genId(), text, checked: false });
+        document.getElementById("extraInput").value = "";
+        saveState();
+        renderExtras();
+    });
 
-    // add budget row
-    const addOrcamentoBtn = document.getElementById("addOrcamentoBtn");
-    if (addOrcamentoBtn) {
-        addOrcamentoBtn.addEventListener("click", () => {
-            state.orcamento.push({ id: genId(), label: "Novo item", value: 0 });
-            saveState();
-            renderOrcamento();
-        });
-    }
+    document.getElementById("addOrcamentoBtn").addEventListener("click", () => {
+        state.orcamento.push({ id: genId(), label: "Novo item", value: 0 });
+        saveState();
+        renderOrcamento();
+    });
 
-    // notas autosave (with small debounce)
-    (function setupNotasAutosave(){
-        const ta = document.getElementById("notasText");
-        if (!ta) return;
-        let timeout = null;
-        ta.addEventListener("input", () => {
-            state.notas = ta.value;
-            // debounce 600ms
-            if (timeout) clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                saveState();
-            }, 600);
-        });
-    })();
-
-    // initialize lists in DOM (defensive)
-    function ensureListsExist() {
-        categories.forEach(cat => {
-            const el = document.getElementById(cat + "-list");
-            if (!el) {
-                const parent = document.querySelector(`[data-category="${cat}"]`);
-                if (parent) {
-                    const div = document.createElement("div");
-                    div.id = cat + "-list";
-                    parent.appendChild(div);
-                }
-            }
-        });
-    }
-    ensureListsExist();
-
-    // escape text for safety in contenteditable where used for innerHTML
-    function escapeHtml(str) {
-        if (!str && str !== 0) return "";
-        return String(str).replace(/[&<>"']/g, function (s) {
-            return ({
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#39;'
-            })[s];
-        });
-    }
-
-    // initial render
+    // Inicia tudo
     renderAll();
-
-</script>
-
-<!-- 🔐 PROTEÇÃO DE LOGIN + LOGOUT + SYNC FIRESTORE -->
-<script type="module">
-    import app from "./firebase.js"; // seu arquivo existente (assume export default app)
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import {
-        getFirestore,
-        doc,
-        setDoc,
-        getDoc,
-        onSnapshot
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // Flags to avoid write loops
-    let isApplyingRemote = false;
-
-    // reference to Firestore document (preparado quando usuário fizer login)
-    let userPraiaDocRef = null;
-
-    // Keep original local saver
-    const _localSave = window.saveState;
-
-    // Override saveState to also sync to Firestore when logged in
-    window.saveState = async function() {
-        // always save local first
-        try {
-            _localSave();
-        } catch (err) {
-            console.error("Erro salvando local:", err);
-        }
-
-        // if we're currently applying remote update, do not push back
-        if (isApplyingRemote) return;
-
-        // if user doc ref available, push to Firestore
-        if (userPraiaDocRef) {
-            try {
-                // Deep clone state to avoid references
-                const payload = JSON.parse(JSON.stringify(window.state));
-                await setDoc(userPraiaDocRef, payload, { merge: true });
-            } catch (err) {
-                console.error("Erro salvando no Firestore:", err);
-            }
-        }
-    };
-
-    onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-            // redireciona para login se necessário (como antes)
-            window.location.href = "login.html";
-            return;
-        }
-
-        const uid = user.uid;
-        // definir ref: /usuarios/{uid}/praia/state
-        userPraiaDocRef = doc(db, "usuarios", uid, "praia", "state");
-
-        // check remote doc existence
-        try {
-            const snap = await getDoc(userPraiaDocRef);
-            const importedFlagKey = "praia_imported_v1";
-
-            const localRaw = localStorage.getItem("praia_state_v1");
-            const localHas = !!localRaw;
-
-            // if remote does NOT exist but local exists and not yet imported -> upload local
-            if (!snap.exists() && localHas && !localStorage.getItem(importedFlagKey)) {
-                try {
-                    const localState = JSON.parse(localRaw);
-                    await setDoc(userPraiaDocRef, localState);
-                    // mark imported so we don't re-upload on next login
-                    localStorage.setItem(importedFlagKey, "1");
-                    console.log("Local state imported to Firestore (first-time).");
-                } catch (err) {
-                    console.error("Erro importando local para Firestore:", err);
-                }
-            }
-
-            // now attach real-time listener to keep local in sync with Firestore
-            onSnapshot(userPraiaDocRef, (docSnap) => {
-                if (!docSnap.exists()) return;
-                const remote = docSnap.data();
-                // If remote is identical to local, skip
-                try {
-                    const local = JSON.parse(localStorage.getItem("praia_state_v1") || "{}");
-                    const same = JSON.stringify(local) === JSON.stringify(remote);
-                    if (same) return;
-                } catch (e) {
-                    // ignore
-                }
-
-                // Apply remote state locally (prevent re-upload loop)
-                isApplyingRemote = true;
-                try {
-                    // Merge remote into window.state (so we keep structure)
-                    window.state = Object.assign({}, window.state, remote);
-                    // ensure categorias exists
-                    if (!window.state.categorias) window.state.categorias = {};
-                    // save local and re-render
-                    localStorage.setItem("praia_state_v1", JSON.stringify(window.state));
-                    // render
-                    if (typeof window.renderAll === "function") window.renderAll();
-                } catch (err) {
-                    console.error("Erro aplicando estado remoto:", err);
-                } finally {
-                    // small delay to avoid races
-                    setTimeout(() => { isApplyingRemote = false; }, 200);
-                }
-            }, (err) => {
-                console.error("Erro no onSnapshot:", err);
-            });
-
-        } catch (err) {
-            console.error("Erro checando doc Firestore:", err);
-        }
-    });
-
-    // logout button behavior (mantive)
-    const logoutBtn = document.getElementById("logoutBtn");
-    if (logoutBtn) {
-        logoutBtn.addEventListener("click", async () => {
-            try {
-                await signOut(auth);
-            } catch (err) {
-                console.error("Erro ao deslogar:", err);
-            }
-        });
-    }
-
 </script>
 
 </body>

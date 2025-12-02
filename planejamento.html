@@ -16,6 +16,21 @@
 
 <body>
 
+<!-- 🔐 PROTEÇÃO DE LOGIN -->
+<script type="module">
+    import app from "./firebase.js";
+    import { getAuth, onAuthStateChanged }
+        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = "login.html";
+        }
+    });
+</script>
+
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg fixed-top custom-navbar bg-white shadow-sm">
     <div class="container-fluid">
@@ -330,21 +345,6 @@
     /* --------------------------------------------- */
     atualizarTabela();
     atualizarRendas();
-</script>
-
-<!-- 🔐 PROTEÇÃO DE LOGIN -->
-<script type="module">
-    import app from "./firebase.js";
-    import { getAuth, onAuthStateChanged }
-        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-    const auth = getAuth(app);
-
-    onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            window.location.href = "login.html";
-        }
-    });
 </script>
 
 <!-- 🔥 FIREBASE – SALVAR E CARREGAR DADOS DO USUÁRIO -->
