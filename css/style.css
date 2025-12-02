@@ -31,10 +31,6 @@ body {
     color: #444;
 }
 
-.custom-navbar .navbar-brand:hover {
-    color: #000;
-}
-
 .custom-navbar .nav-link {
     font-weight: 500;
     color: #6b6b6b;
@@ -90,6 +86,11 @@ table {
     background: #fff;
     border-radius: 10px;
     overflow: hidden;
+    width: 100%;
+}
+
+.table-responsive {
+    overflow-x: auto;
 }
 
 thead {
@@ -158,4 +159,64 @@ table td, table th {
     right: -210px;
     width: 750px;
     pointer-events: none;
+}
+
+/* -------------------------------------------------- */
+/* RESPONSIVIDADE — CELULAR                            */
+/* -------------------------------------------------- */
+@media (max-width: 768px) {
+
+    body {
+        padding-top: 70px;
+    }
+
+    .main-wrapper {
+        padding: 18px;
+        border-radius: 10px;
+    }
+
+    h1 {
+        font-size: 26px;
+    }
+
+    /* Imagens decorativas somem no mobile */
+    .img-resumo-decor,
+    .img-affirm-decor {
+        display: none;
+    }
+
+    /* Tabelas roláveis */
+    .table-responsive {
+        border-radius: 10px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Navbar menor */
+    .navbar-brand {
+        font-size: 16px !important;
+    }
+
+    .nav-link {
+        font-size: 15px !important;
+        padding: 10px;
+    }
+
+    /* Boxes ajustados */
+    .affirm-box,
+    .resumo-box {
+        min-height: auto;
+    }
+}
+
+/* EXTRA — Ajuste para telas MUITO pequenas */
+@media (max-width: 420px) {
+
+    h1 {
+        font-size: 22px;
+    }
+
+    .navbar-brand {
+        font-size: 14px !important;
+    }
 }

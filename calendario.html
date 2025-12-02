@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Calendário Firebase</title>
+    <title>Calendário</title>
 
     <!-- BOOTSTRAP -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
@@ -16,7 +16,7 @@
 
     <style>
         body {
-            padding-top: 80px; /* espaço para a navbar */
+            padding-top: 80px;
         }
     </style>
 </head>
@@ -39,35 +39,11 @@
         <div class="collapse navbar-collapse" id="menu">
             <ul class="navbar-nav ms-auto">
 
-                <li class="nav-item">
-                    <a class="nav-link" href="index.html">
-                        <i class="bi bi-house-door"></i> Início
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="planejamento.html">
-                        <i class="bi bi-cash-stack"></i> Planejamento
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="praia.html">
-                        <i class="bi bi-sun"></i> Praia
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="atrasadas.html">
-                        <i class="bi bi-exclamation-triangle"></i> Atrasadas
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="calendario.html">
-                        <i class="bi bi-calendar3"></i> Calendário
-                    </a>
-                </li>
+                <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house-door"></i> Início</a></li>
+                <li class="nav-item"><a class="nav-link" href="planejamento.html"><i class="bi bi-cash-stack"></i> Planejamento</a></li>
+                <li class="nav-item"><a class="nav-link" href="praia.html"><i class="bi bi-sun"></i> Praia</a></li>
+                <li class="nav-item"><a class="nav-link" href="atrasadas.html"><i class="bi bi-exclamation-triangle"></i> Atrasadas</a></li>
+                <li class="nav-item"><a class="nav-link active" href="calendario.html"><i class="bi bi-calendar3"></i> Calendário</a></li>
 
                 <li class="nav-item ms-3">
                     <button id="logoutBtn" class="btn btn-danger btn-sm">Sair</button>
@@ -80,34 +56,40 @@
 </nav>
 
 <div class="container mt-4">
-    <h2 class="text-center mb-4">Calendário com FullCalendar + Firebase</h2>
+    <h2 class="text-center mb-4">Calendário</h2>
     <div id="calendar" class="bg-white p-3 rounded shadow"></div>
 </div>
 
-<!-- MODAL -->
+<!-- MODAL EVENTO -->
 <div class="modal fade" id="eventModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
+
             <div class="modal-header">
                 <h5 class="modal-title">Evento</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+
             <div class="modal-body">
                 <input type="hidden" id="event-id">
+
                 <div class="mb-3">
                     <label class="form-label">Título</label>
-                    <input type="text" class="form-control" id="event-title">
+                    <input type="text" id="event-title" class="form-control">
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">Data</label>
-                    <input type="date" class="form-control" id="event-date" readonly>
+                    <input type="date" id="event-date" class="form-control" readonly>
                 </div>
             </div>
+
             <div class="modal-footer">
-                <button type="button" id="delete-event" class="btn btn-danger me-auto">Excluir</button>
-                <button type="button" id="save-event" class="btn btn-primary">Salvar</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button id="delete-event" class="btn btn-danger me-auto">Excluir</button>
+                <button id="save-event" class="btn btn-primary">Salvar</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
             </div>
+
         </div>
     </div>
 </div>
@@ -119,9 +101,9 @@
 <script type="module">
 
     /* ------------------------------------------------------------
-       IMPORTAR FIREBASE
+       FIREBASE
     ------------------------------------------------------------ */
-    import app, { db } from "./firebase.js";
+    import app from "./firebase.js";
 
     import {
         getAuth,
@@ -130,6 +112,7 @@
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     import {
+        getFirestore,
         collection,
         getDocs,
         addDoc,
@@ -138,49 +121,55 @@
         doc
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let usuarioId = null;
 
     /* ------------------------------------------------------------
-       AUTENTICAÇÃO — PROTEÇÃO DE LOGIN
+       LOGIN PROTEGIDO
     ------------------------------------------------------------ */
-    const auth = getAuth(app);
-
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         if (!user) {
             window.location.href = "login.html";
+            return;
         }
+
+        usuarioId = user.uid;
+        carregarCalendario();
     });
 
     document.getElementById("logoutBtn").onclick = () => signOut(auth);
 
-
     /* ------------------------------------------------------------
-       CALENDÁRIO
+       FUNÇÃO PRINCIPAL: CONSTRUIR O CALENDÁRIO
     ------------------------------------------------------------ */
-    document.addEventListener("DOMContentLoaded", async function () {
+    async function carregarCalendario() {
 
         const modal = new bootstrap.Modal(document.getElementById("eventModal"));
         const calendarEl = document.getElementById("calendar");
 
-        /* --- Buscar eventos no Firestore --- */
-        let eventos = [];
-        const snapshot = await getDocs(collection(db, "eventos"));
+        /* --- Buscar eventos do usuário --- */
+        const eventos = [];
+        const snap = await getDocs(collection(db, `usuarios/${usuarioId}/eventos`));
 
-        snapshot.forEach(docSnap => {
+        snap.forEach(d => {
             eventos.push({
-                id: docSnap.id,
-                title: docSnap.data().title,
-                start: docSnap.data().start
+                id: d.id,
+                title: d.data().title,
+                start: d.data().date
             });
         });
 
-        /* --- Inicializar calendário --- */
+        /* --- Iniciar o calendário --- */
         const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: "dayGridMonth",
             locale: "pt-br",
+            initialView: "dayGridMonth",
             selectable: true,
             editable: true,
             events: eventos,
 
+            /* Criar evento */
             dateClick(info) {
                 document.querySelector(".modal-title").innerText = "Novo Evento";
                 document.getElementById("event-id").value = "";
@@ -190,6 +179,7 @@
                 modal.show();
             },
 
+            /* Editar evento */
             eventClick(info) {
                 document.querySelector(".modal-title").innerText = "Editar Evento";
                 document.getElementById("event-id").value = info.event.id;
@@ -199,67 +189,59 @@
                 modal.show();
             },
 
-            eventDrop(info) {
-                atualizar(info.event);
-            },
-
-            eventResize(info) {
-                atualizar(info.event);
+            /* Arrastar evento */
+            async eventDrop(info) {
+                await updateDoc(doc(db, `usuarios/${usuarioId}/eventos/${info.event.id}`), {
+                    title: info.event.title,
+                    date: info.event.startStr
+                });
             }
         });
 
         calendar.render();
 
-
         /* ------------------------------------------------------------
-           BOTÃO SALVAR
+           SALVAR EVENTO
         ------------------------------------------------------------ */
         document.getElementById("save-event").onclick = async () => {
             const id = document.getElementById("event-id").value;
-            const title = document.getElementById("event-title").value;
-            const start = document.getElementById("event-date").value;
+            const title = document.getElementById("event-title").value.trim();
+            const date = document.getElementById("event-date").value;
 
-            if (!title.trim()) return alert("Informe o título");
+            if (!title) return alert("Digite o título");
 
             if (id === "") {
-                const ref = await addDoc(collection(db, "eventos"), { title, start });
-                calendar.addEvent({ id: ref.id, title, start });
+                // Criar novo
+                const ref = await addDoc(collection(db, `usuarios/${usuarioId}/eventos`), {
+                    title, date
+                });
+                calendar.addEvent({ id: ref.id, title, start: date });
             } else {
-                await updateDoc(doc(db, "eventos", id), { title, start });
+                // Atualizar
+                await updateDoc(doc(db, `usuarios/${usuarioId}/eventos/${id}`), {
+                    title, date
+                });
                 const ev = calendar.getEventById(id);
-                if (ev) {
-                    ev.setProp("title", title);
-                    ev.setStart(start);
-                }
+                ev.setProp("title", title);
+                ev.setStart(date);
             }
 
             modal.hide();
         };
 
-
         /* ------------------------------------------------------------
-           BOTÃO EXCLUIR
+           EXCLUIR EVENTO
         ------------------------------------------------------------ */
         document.getElementById("delete-event").onclick = async () => {
             const id = document.getElementById("event-id").value;
-            await deleteDoc(doc(db, "eventos", id));
+            await deleteDoc(doc(db, `usuarios/${usuarioId}/eventos/${id}`));
+
             const ev = calendar.getEventById(id);
             if (ev) ev.remove();
+
             modal.hide();
         };
-
-
-        /* ------------------------------------------------------------
-           ATUALIZAÇÃO AO ARRASTAR / REDIMENSIONAR
-        ------------------------------------------------------------ */
-        async function atualizar(ev) {
-            await updateDoc(doc(db, "eventos", ev.id), {
-                title: ev.title,
-                start: ev.startStr
-            });
-        }
-
-    });
+    }
 
 </script>
 
