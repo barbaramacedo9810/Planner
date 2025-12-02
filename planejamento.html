@@ -20,7 +20,6 @@
 <script type="module">
     import app, { db } from "./firebase.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { collection, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const auth = getAuth(app);
 
@@ -30,11 +29,6 @@
             window.location.href = "login.html";
         }
     });
-
-    // Expondo alguns métodos para uso posterior caso queira (opcional)
-    window.__PLAN_AUTH = auth;
-    window.__PLAN_DB = db;
-    window.__PLAN_FS = { collection, getDocs, doc, getDoc, setDoc };
 </script>
 <!-- 🔐 FIM PROTEÇÃO -->
 
@@ -234,7 +228,7 @@
     function labelFromMonthKey(key) {
         const [y,m] = key.split("-");
         const idx = parseInt(m,10)-1;
-        return `${MONTH_NAMES[idx]} / ${y}`;
+        return `${MONTH_NAMES[idx]} / ${y}`; // formato pedido
     }
 
     function prevMonthKey(key) {
@@ -246,8 +240,7 @@
     }
 
     // ------------------ estado local (UI) ------------------
-    // estrutura que será salva por mês:
-    // { debitos: [{nome,valor}], rendas: [{nome,valor}], updatedAt: "... (opcional)" }
+    // valores REAIS (mantidos como você pediu) — estes serão usados como conteúdo de DEZEMBRO pré-populado
     let debitos = [
         { nome: "Luz", valor: 300 },
         { nome: "Cartão", valor: 800 },
@@ -274,6 +267,7 @@
         { nome: "Renda 4", valor: 280 }
     ];
 
+    // DOM refs
     const tabelaBody = document.querySelector("#tabelaDebitos tbody");
     const listaRendas = document.getElementById("rendasLista");
     const monthSelect = document.getElementById("monthSelect");
@@ -283,15 +277,13 @@
 
     // Firestore helpers
     let usuarioId = null;
-    const PATH_PLANEJAMENTO = ["planejamento","meses"]; // under usuarios/{uid}/planejamento/meses/{docId}
+    const PATH_PLANEJAMENTO = ["planejamento","meses"]; // under usuarios/{uid}/planejamento/meses/{monthKey}
 
     function collectionRefForMonths(uid) {
-        // usuarios/{uid}/planejamento/meses
         return collection(db, "usuarios", uid, ...PATH_PLANEJAMENTO);
     }
 
     function docRefForMonth(uid, monthKey) {
-        // usuarios/{uid}/planejamento/meses/{monthKey}
         return doc(db, "usuarios", uid, ...PATH_PLANEJAMENTO, monthKey);
     }
 
@@ -304,7 +296,7 @@
 
             tr.innerHTML = `
             <td contenteditable="true" oninput="window.__editarDebito(${index}, 'nome', this.innerText)">
-                ${item.nome}
+                ${escapeHtml(item.nome)}
             </td>
 
             <td contenteditable="true" oninput="window.__editarDebito(${index}, 'valor', this.innerText)">
@@ -332,7 +324,7 @@
 
             div.innerHTML = `
             <div contenteditable="true" oninput="window.__editarRenda(${index}, 'nome', this.innerText)">
-                ${item.nome}
+                ${escapeHtml(item.nome)}
             </div>
 
             <div class="d-flex align-items-center">
@@ -363,7 +355,7 @@
         document.getElementById("saldoFinal").innerText = "R$ " + saldo.toFixed(2).replace(".", ",");
     }
 
-    // Expondo pequenos utilitários (usados nos contenteditable)
+    // Expondo utilitários usados nos contenteditable
     window.__editarDebito = function(i, campo, valor) {
         if (campo === "valor") valor = valor.replace(",", ".");
         if (campo === "valor") valor = parseFloat(valor) || 0;
@@ -407,8 +399,21 @@
     let autoSaveInterval = null;
     let lastChangeTimestamp = 0;
 
-    function getCurrentMonthKeyDefault() {
-        return monthKeyFromDate(new Date());
+    // Prepopulate DECEMBER of current year with your real values (only once per user if doc missing)
+    const PREPOP_YEAR = new Date().getFullYear();
+    const PREPOPULATED_MONTH = `${PREPOP_YEAR}-12`;
+
+    function escapeHtml(str) {
+        if (!str && str !== 0) return "";
+        return String(str).replace(/[&<>"']/g, function (s) {
+            return ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[s];
+        });
     }
 
     async function listMonthsFromFirestore(uid) {
@@ -416,13 +421,12 @@
         const snap = await getDocs(col);
         const months = [];
         snap.forEach(d => months.push(d.id));
-        months.sort(); // lexicographic sorts ISO yyyy-mm correctly
+        months.sort();
         return months;
     }
 
     function populateMonthSelect() {
         monthSelect.innerHTML = "";
-        // Add option to create arbitrary month using a "YYYY-MM" format input (we also have buttons)
         availableMonths.forEach(key => {
             const opt = document.createElement("option");
             opt.value = key;
@@ -430,7 +434,7 @@
             monthSelect.appendChild(opt);
         });
 
-        // if currentMonthKey not in availableMonths, add it as selectable (but not saved yet)
+        // if currentMonthKey not in availableMonths, add it as temporary selectable and mark "(novo)"
         if (currentMonthKey && !availableMonths.includes(currentMonthKey)) {
             const opt = document.createElement("option");
             opt.value = currentMonthKey;
@@ -439,18 +443,14 @@
             monthSelect.prepend(opt);
         }
 
-        // select currentMonthKey
-        if (currentMonthKey) {
-            monthSelect.value = currentMonthKey;
-        }
+        if (currentMonthKey) monthSelect.value = currentMonthKey;
     }
 
     async function loadMonth(uid, monthKey) {
-        // load from firestore; if not exists, leave defaults (but clear if "new month empty" desired)
         const ref = docRefForMonth(uid, monthKey);
         const snap = await getDoc(ref);
         if (!snap.exists()) {
-            // New month: Opção A — começa vazio
+            // new month starts EMPTY (Opção 2)
             debitos = [];
             rendas = [];
         } else {
@@ -460,12 +460,9 @@
         }
 
         currentMonthKey = monthKey;
-        // update UI label display in select
         populateMonthSelect();
         atualizarTabela();
         atualizarRendas();
-
-        // ensure autosave is pointed to this doc (handled by autosave using currentMonthKey)
         marcarAlteracao();
     }
 
@@ -478,23 +475,20 @@
         };
         const ref = docRefForMonth(uid, monthKey);
         await setDoc(ref, payload, { merge: true });
-        // refresh months list (if new created)
+        // refresh months list if new created
         availableMonths = await listMonthsFromFirestore(uid);
         populateMonthSelect();
     }
 
-    // create a new month empty (and select it)
     async function createNewMonth(uid, monthKey) {
-        // if monthKey omitted, open prompt for YYYY-MM
+        // if monthKey omitted, ask user for YYYY-MM (default next month)
         let mk = monthKey;
         if (!mk) {
-            // default to next month
             const d = new Date();
             d.setMonth(d.getMonth() + 1);
-            mk = monthKeyFromDate(d);
-            const userInput = prompt("Informe o mês no formato YYYY-MM (ex: 2026-01) ou deixe:", mk);
+            let suggested = monthKeyFromDate(d);
+            const userInput = prompt("Informe o mês no formato YYYY-MM (ex: 2026-01) ou cancele:", suggested);
             if (!userInput) return null;
-            // basic validation
             if (!/^\d{4}-\d{2}$/.test(userInput)) {
                 alert("Formato inválido. Use YYYY-MM.");
                 return null;
@@ -513,14 +507,12 @@
         return mk;
     }
 
-    // duplicate previous month into the currently selected month (overwrites current)
     async function duplicatePreviousMonth(uid, targetMonthKey) {
         if (!targetMonthKey) {
             alert("Selecione primeiro o mês de destino no seletor.");
             return;
         }
         const sourceKey = prevMonthKey(targetMonthKey);
-        // get source doc
         const srcRef = docRefForMonth(uid, sourceKey);
         const srcSnap = await getDoc(srcRef);
         if (!srcSnap.exists()) {
@@ -538,25 +530,20 @@
         alert(`Mês ${labelFromMonthKey(sourceKey)} duplicado para ${labelFromMonthKey(targetMonthKey)}.`);
     }
 
-    // mark that the UI changed (used to trigger autosave)
     function marcarAlteracao() {
         lastChangeTimestamp = Date.now();
     }
 
-    // autosave loop (1s), saves to current selected month if user logged
     function startAutoSaveLoop() {
         if (autoSaveInterval) clearInterval(autoSaveInterval);
         autoSaveInterval = setInterval(async () => {
-            // if no recent changes, skip to reduce writes (but still periodically)
-            // We'll save if lastChangeTimestamp within last 2 seconds OR every 10 seconds forced.
             const now = Date.now();
             if (!usuarioId || !currentMonthKey) return;
             const changedRecently = (now - lastChangeTimestamp) < 2000;
-            const saveAnyway = (now % 10000) < 1000; // rough every ~10s
+            const saveAnyway = (now % 10000) < 1000;
             if (!changedRecently && !saveAnyway) return;
             try {
                 await saveMonthToFirestore(usuarioId, currentMonthKey);
-                // clear lastChangeTimestamp to avoid continuous saves
                 lastChangeTimestamp = 0;
             } catch (e) {
                 console.error("Erro auto-salvando:", e);
@@ -566,32 +553,48 @@
 
     // ------------------ auth + initialization ------------------
     onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-            // redirect is handled earlier, but keep safety
-            return;
-        }
-
-        // store uid for later operations
+        if (!user) return;
         usuarioId = user.uid;
 
-        // populate months list
+        // list months
         availableMonths = await listMonthsFromFirestore(usuarioId);
 
-        // default selection: current month
-        const defaultKey = getCurrentMonthKeyDefault();
+        // ensure DECEMBER of current year is present with your real values if missing
+        if (!availableMonths.includes(PREPOPULATED_MONTH)) {
+            // create the doc with the REAIS values (only if not already present)
+            try {
+                // prepare payload with current debitos/rendas variables (which contain your real values)
+                const payload = {
+                    debitos,
+                    rendas,
+                    updatedAt: new Date().toISOString()
+                };
+                const preRef = docRefForMonth(usuarioId, PREPOPULATED_MONTH);
+                const preSnap = await getDoc(preRef);
+                if (!preSnap.exists()) {
+                    await setDoc(preRef, payload, { merge: true });
+                    // refresh months list
+                    availableMonths = await listMonthsFromFirestore(usuarioId);
+                }
+            } catch (e) {
+                console.error("Erro criando mês pré-populado:", e);
+            }
+        }
 
-        // if there are no months yet, create a doc for current month as "novo" (but per Opção A, we prefer empty)
-        // We'll not auto-create doc, only select it in UI and allow user to save.
+        // default selection: current month key (today)
+        const defaultKey = monthKeyFromDate(new Date());
         currentMonthKey = defaultKey;
 
+        // if default exists in DB, load it. Else if PREPOPULATED_MONTH is the default (i.e. current is Dec), we'll load it.
+        // If default doesn't exist, start empty (Opção 2).
         populateMonthSelect();
 
-        // If current month exists in Firestore, load it, else leave empty or load existing page values?
-        // Per your choice (Opção A): new month starts empty — so load from Firestore only if exists.
         if (availableMonths.includes(currentMonthKey)) {
             await loadMonth(usuarioId, currentMonthKey);
+        } else if (currentMonthKey === PREPOPULATED_MONTH && availableMonths.includes(PREPOPULATED_MONTH)) {
+            await loadMonth(usuarioId, PREPOPULATED_MONTH);
         } else {
-            // start empty (Opção A)
+            // start empty (but keep in-memory debitos/rendas as empty to reflect Opção 2)
             debitos = [];
             rendas = [];
             atualizarTabela();
@@ -611,17 +614,13 @@
 
     // new month button
     newMonthBtn.addEventListener("click", async () => {
-        // create empty month and select it
         const mk = await createNewMonth(usuarioId);
-        if (mk) {
-            alert(`Mês ${labelFromMonthKey(mk)} criado (vazio).`);
-        }
+        if (mk) alert(`Mês ${labelFromMonthKey(mk)} criado (vazio).`);
     });
 
     // duplicate button
     duplicateBtn.addEventListener("click", async () => {
-        // ask user for target month (default to currentMonthKey)
-        const defaultTarget = currentMonthKey || getCurrentMonthKeyDefault();
+        const defaultTarget = currentMonthKey || monthKeyFromDate(new Date());
         const userInput = prompt("Informe o mês destino (YYYY-MM) para duplicar o mês anterior para ele:", defaultTarget);
         if (!userInput) return;
         if (!/^\d{4}-\d{2}$/.test(userInput)) {
@@ -631,7 +630,7 @@
         await duplicatePreviousMonth(usuarioId, userInput);
     });
 
-    // logout behavior (keep)
+    // logout behavior
     if (logoutBtn) {
         logoutBtn.addEventListener("click", async () => {
             try {
@@ -647,15 +646,14 @@
     atualizarTabela();
     atualizarRendas();
 
-    // marca alteração sempre que o usuário faz algo (safeguard)
-    // contenteditable handlers already call marcarAlteracao via __editarDebito/__editarRenda
-    // also observe DOM changes like adding/removing
+    // asegurar que marcarAlteracao é chamado nos botões já existentes (pequeno safeguard)
     const originalAddDebito = document.getElementById("addDebitoBtn").onclick;
     document.getElementById("addDebitoBtn").onclick = function() { originalAddDebito(); marcarAlteracao(); };
     const originalAddRenda = document.getElementById("addRendaBtn").onclick;
     document.getElementById("addRendaBtn").onclick = function() { originalAddRenda(); marcarAlteracao(); };
 
 </script>
+
 
 </body>
 </html>
