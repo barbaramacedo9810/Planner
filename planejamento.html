@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Planejamento Financeiro</title>
 
     <!-- Bootstrap -->
@@ -11,21 +10,17 @@
     <!-- Ícones Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- CSS -->
+    <!-- Seu CSS externo -->
     <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
-<!-- ======================== -->
-<!-- PROTEÇÃO DE LOGIN        -->
-<!-- ======================== -->
+<!-- Proteção de login -->
 <script type="module">
     import app from "./firebase.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const auth = getAuth(app);
-
     onAuthStateChanged(auth, (user) => {
         if (!user) {
             window.location.href = "login.html";
@@ -33,12 +28,9 @@
     });
 </script>
 
-<!-- ======================== -->
-<!-- NAVBAR                   -->
-<!-- ======================== -->
+<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg fixed-top custom-navbar bg-white shadow-sm">
     <div class="container-fluid">
-
         <a class="navbar-brand d-flex align-items-center" href="index.html">
             <i class="bi bi-journal-check" style="font-size:22px; margin-right:6px;"></i>
             Planejamento
@@ -50,7 +42,6 @@
 
         <div class="collapse navbar-collapse" id="menu">
             <ul class="navbar-nav ms-auto">
-
                 <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house-door"></i> Início</a></li>
                 <li class="nav-item"><a class="nav-link active" href="planejamento.html"><i class="bi bi-cash-stack"></i> Planejamento</a></li>
                 <li class="nav-item"><a class="nav-link" href="praia.html"><i class="bi bi-sun"></i> Praia</a></li>
@@ -60,17 +51,13 @@
                 <li class="nav-item ms-3">
                     <button id="logoutBtn" class="btn btn-danger btn-sm">Sair</button>
                 </li>
-
             </ul>
         </div>
-
     </div>
 </nav>
 
-<!-- ======================== -->
-<!-- CONTEÚDO PRINCIPAL       -->
-<!-- ======================== -->
-<div class="main-wrapper mt-5">
+<!-- CONTEÚDO PRINCIPAL -->
+<div class="main-wrapper">
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1>Planejamento Financeiro</h1>
@@ -85,17 +72,19 @@
     </div>
 
     <!-- RESUMO -->
-    <div class="resumo-box shadow-sm mb-4">
-        <p>Total de Saída: <strong id="resumoSaida">R$ 0,00</strong></p>
-        <p>Total de Rendas: <strong id="resumoRendas">R$ 0,00</strong></p>
-        <p>Saldo Final: <strong id="saldoFinal">R$ 0,00</strong></p>
+    <div id="resumoWrapper" class="resumo-box shadow-sm mb-4 p-3 rounded">
+        <div class="resumo-content">
+            <p>Total de Saída: <strong id="resumoSaida">R$ 0,00</strong></p>
+            <p>Total de Rendas: <strong id="resumoRendas">R$ 0,00</strong></p>
+            <p>Saldo Final: <strong id="saldoFinal">R$ 0,00</strong></p>
+        </div>
 
-        <img src="img/planejamento.png" class="img-resumo-decor">
+        <!-- porquinho -->
+        <img src="img/planejamento.png" alt="Porquinho" class="resumo-img">
     </div>
 
     <div class="row mt-4">
-
-        <!-- Débitos -->
+        <!-- ESQUERDA - TABELA -->
         <div class="col-md-8">
             <div class="d-flex justify-content-between mb-2">
                 <h4 class="fw-bold">Débitos</h4>
@@ -124,47 +113,48 @@
             </table>
         </div>
 
-        <!-- Coluna direita -->
+        <!-- DIREITA - RENDAS + AFIRMAÇÕES -->
         <div class="col-md-4">
 
-            <!-- Rendas -->
+            <!-- RENDAS -->
             <div class="card renda-card shadow-sm mb-4">
                 <div class="card-body">
-                    <h4 class="fw-bold d-flex justify-content-between">
+                    <h4 class="fw-bold d-flex justify-content-between align-items-center">
                         Rendas
-                        <button class="btn btn-success btn-sm" id="addRendaBtn"><i class="bi bi-plus-circle"></i></button>
+                        <button class="btn btn-success btn-sm" id="addRendaBtn">
+                            <i class="bi bi-plus-circle"></i>
+                        </button>
                     </h4>
 
                     <div id="rendasLista"></div>
 
-                    <p class="fw-bold mt-3">Total de Entradas: <span id="totalRendas" class="text-success">R$ 0,00</span></p>
+                    <p class="fw-bold mt-3">Total de Entradas:
+                        <span id="totalRendas" class="text-success">R$ 0,00</span>
+                    </p>
                 </div>
             </div>
 
-            <!-- Afirmações -->
+            <!-- AFIRMAÇÕES -->
             <div class="affirm-box mt-3">
                 <h5 class="affirm-title">✨ Afirmações Positivas</h5>
+                <div class="affirm-list">
+                    <div class="affirm-item">"A prosperidade começa na mente. Cultive pensamentos positivos."</div>
+                    <div class="affirm-item">"Sou merecedora de toda a abundância que o universo tem para me oferecer."</div>
+                    <div class="affirm-item">"A prosperidade flui livremente em minha vida com leveza."</div>
+                </div>
 
-                <div class="affirm-item">"A prosperidade começa na mente."</div>
-                <div class="affirm-item">"Sou merecedora de abundância."</div>
-                <div class="affirm-item">"A prosperidade flui livremente."</div>
-
-                <img src="img/planejamento1.png" class="img-affirm-decor">
+                <!-- menininha -->
+                <img src="img/planejamento1.png" alt="Menininha" class="menininha-img">
             </div>
 
         </div>
     </div>
-
 </div>
 
-<!-- Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- =============================== -->
-<!-- SCRIPT COMPLETO DO SISTEMA      -->
-<!-- =============================== -->
+<!-- SCRIPT PRINCIPAL -->
 <script type="module">
-
     import app, { db } from "./firebase.js";
     import {
         getAuth,
@@ -180,14 +170,20 @@
         setDoc
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+    /* -------------------------
+       UTILITÁRIOS
+       ------------------------- */
     const auth = getAuth(app);
 
-    /* MESES */
-    const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+    const MONTH_NAMES = [
+        "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+        "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+    ];
 
-    function labelFromKey(key) {
+    function labelFromKey(key){
+        if(!key) return "";
         const [y,m] = key.split("-");
-        return `${MONTHS[Number(m)-1]} / ${y}`;
+        return `${MONTH_NAMES[Number(m)-1] || m} / ${y}`;
     }
 
     function prevMonthKey(key) {
@@ -197,79 +193,141 @@
         return `${y}-${String(m).padStart(2,"0")}`;
     }
 
-    /* VARIÁVEIS */
+    function formatBRL(value){
+        const n = Number(value) || 0;
+        return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    }
+
+    /* ESTADO */
     let usuarioId = null;
     let availableMonths = [];
     let currentMonthKey = null;
     let debitos = [];
     let rendas = [];
 
-    /* FIRESTORE PATH */
-    const colMeses = (uid) => collection(db, "usuarios", uid, "planejamento", "meses");
-    const docMes = (uid, key) => doc(db, "usuarios", uid, "planejamento", "meses", key);
-
-    /* ELEMENTOS */
+    /* DOM */
     const tabelaBody = document.querySelector("#tabelaDebitos tbody");
     const rendasLista = document.getElementById("rendasLista");
     const monthSelect = document.getElementById("monthSelect");
+    const newMonthBtn = document.getElementById("newMonthBtn");
+    const duplicateBtn = document.getElementById("duplicateBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    const resumoSaidaEl = document.getElementById("resumoSaida");
+    const resumoRendasEl = document.getElementById("resumoRendas");
+    const saldoFinalEl = document.getElementById("saldoFinal");
+    const totalSaidaFooter = document.getElementById("totalSaida");
+    const totalRendasEl = document.getElementById("totalRendas");
+
+    /* FIRESTORE HELPERS */
+    const colMeses = (uid) => collection(db, "usuarios", uid, "planejamento", "meses");
+    const docMes = (uid, key) => doc(db, "usuarios", uid, "planejamento", "meses", key);
 
     /* LISTAR MESES */
     async function carregarListaMeses() {
-        const snap = await getDocs(colMeses(usuarioId));
-        availableMonths = [];
-        snap.forEach(d => availableMonths.push(d.id));
-        availableMonths.sort();
-        atualizarSelect();
+        try {
+            const snap = await getDocs(colMeses(usuarioId));
+            availableMonths = [];
+            snap.forEach(d => availableMonths.push(d.id));
+            availableMonths.sort();
+            atualizarSelect();
+        } catch (err) {
+            console.error("Erro ao listar meses:", err);
+        }
     }
 
-    /* ATUALIZAR SELECT */
-    function atualizarSelect() {
+    function atualizarSelect(){
+        const previous = monthSelect.value;
         monthSelect.innerHTML = "";
+
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = "";
+        monthSelect.appendChild(placeholder);
+
         availableMonths.forEach(key => {
             const op = document.createElement("option");
             op.value = key;
             op.textContent = labelFromKey(key);
             monthSelect.appendChild(op);
         });
-        if (currentMonthKey) monthSelect.value = currentMonthKey;
+
+        if (currentMonthKey && availableMonths.includes(currentMonthKey)) {
+            monthSelect.value = currentMonthKey;
+        } else if (availableMonths.length > 0) {
+            monthSelect.value = availableMonths[availableMonths.length - 1];
+        } else {
+            monthSelect.value = "";
+        }
+
+        if (monthSelect.value && monthSelect.value !== previous) {
+            carregarMes(monthSelect.value).catch(console.error);
+        }
     }
 
     /* CARREGAR MÊS */
     async function carregarMes(key) {
-        const snap = await getDoc(docMes(usuarioId, key));
-        if (snap.exists()) {
-            const data = snap.data();
-            debitos = data.debitos || [];
-            rendas = data.rendas || [];
-        } else {
-            debitos = [];
-            rendas = [];
+        try {
+            if (!key) {
+                debitos = [];
+                rendas = [];
+                renderDebitos();
+                renderRendas();
+                atualizarTotais();
+                currentMonthKey = null;
+                return;
+            }
+
+            const ref = docMes(usuarioId, key);
+            const snap = await getDoc(ref);
+
+            if (snap.exists()) {
+                const data = snap.data();
+                debitos = Array.isArray(data.debitos) ? data.debitos : [];
+                rendas = Array.isArray(data.rendas) ? data.rendas : [];
+            } else {
+                debitos = [];
+                rendas = [];
+            }
+
+            currentMonthKey = key;
+            atualizarSelect();
+            renderDebitos();
+            renderRendas();
+            atualizarTotais();
+        } catch (err) {
+            console.error("Erro ao carregar mês:", err);
         }
-        currentMonthKey = key;
-        atualizarSelect();
-        renderDebitos();
-        renderRendas();
-        atualizarTotais();
     }
 
-    /* SALVAR MÊS */
+    /* SALVAR */
     async function salvarMes() {
         if (!usuarioId || !currentMonthKey) return;
-
-        await setDoc(docMes(usuarioId, currentMonthKey), {
-            debitos,
-            rendas,
-            updatedAt: new Date().toISOString()
-        });
-
-        await carregarListaMeses();
+        try {
+            const ref = docMes(usuarioId, currentMonthKey);
+            await setDoc(ref, {
+                debitos,
+                rendas,
+                updatedAt: new Date().toISOString()
+            });
+            await carregarListaMeses();
+        } catch (err) {
+            console.error("Erro ao salvar mês:", err);
+        }
     }
 
     /* NOVO MÊS */
     async function criarNovoMes() {
         const mes = prompt("Informe o mês (YYYY-MM):");
         if (!mes) return;
-        if (!/^\d{4}-\d{2}$/.test(mes)) return alert("Formato inválido.");
+        if (!/^\d{4}-\d{2}$/.test(mes)) {
+            alert("Formato inválido. Use YYYY-MM.");
+            return;
+        }
+
+        if (availableMonths.includes(mes)) {
+            if (!confirm("Já existe um mês com essa chave. Deseja sobrescrever?")) return;
+        }
 
         debitos = [];
         rendas = [];
@@ -277,41 +335,47 @@
 
         await salvarMes();
         await carregarMes(mes);
-
-        alert("Mês criado!");
+        alert("Mês criado com sucesso.");
     }
 
     /* DUPLICAR */
     async function duplicarMes() {
-        const destino = prompt("Duplicar para (YYYY-MM):", currentMonthKey);
-        if (!destino || !/^\d{4}-\d{2}$/.test(destino)) return;
+        const destino = prompt("Para qual mês deseja duplicar? (YYYY-MM):", currentMonthKey || "");
+        if (!destino) return;
+        if (!/^\d{4}-\d{2}$/.test(destino)) { alert("Formato inválido."); return; }
 
         const origem = prevMonthKey(destino);
-        const snap = await getDoc(docMes(usuarioId, origem));
+        try {
+            const snap = await getDoc(docMes(usuarioId, origem));
+            if (!snap.exists()) { alert("Mês anterior não existe."); return; }
+            const data = snap.data();
 
-        if (!snap.exists()) return alert("Mês anterior não existe.");
+            debitos = JSON.parse(JSON.stringify(data.debitos || []));
+            rendas = JSON.parse(JSON.stringify(data.rendas || []));
+            currentMonthKey = destino;
 
-        const data = snap.data();
-        debitos = JSON.parse(JSON.stringify(data.debitos || []));
-        rendas = JSON.parse(JSON.stringify(data.rendas || []));
-
-        currentMonthKey = destino;
-        await salvarMes();
-        await carregarMes(destino);
-
-        alert("Mês duplicado!");
+            await salvarMes();
+            await carregarMes(destino);
+            alert("Mês duplicado com sucesso.");
+        } catch (err) {
+            console.error("Erro ao duplicar:", err);
+            alert("Erro ao duplicar mês. Veja console.");
+        }
     }
 
     /* RENDERIZAÇÃO */
     function renderDebitos() {
         tabelaBody.innerHTML = "";
-        debitos.forEach((d,i) => {
+        debitos.forEach((d, i) => {
             const tr = document.createElement("tr");
+            const nome = (d && d.nome) ? d.nome : "";
+            const valor = Number(d && d.valor ? d.valor : 0).toFixed(2);
+
             tr.innerHTML = `
-                <td contenteditable="true" oninput="__edDeb(${i},'nome',this.innerText)">${d.nome}</td>
-                <td contenteditable="true" oninput="__edDeb(${i},'valor',this.innerText)">${Number(d.valor).toFixed(2)}</td>
+                <td contenteditable="true" oninput="window.__edDeb(${i}, 'nome', this.innerText)">${escapeHtml(nome)}</td>
+                <td contenteditable="true" oninput="window.__edDeb(${i}, 'valor', this.innerText)">${valor}</td>
                 <td class="text-center">
-                    <button class="btn btn-danger btn-sm" onclick="__rmDeb(${i})"><i class="bi bi-trash"></i></button>
+                    <button class="btn btn-danger btn-sm" onclick="window.__rmDeb(${i})"><i class="bi bi-trash"></i></button>
                 </td>
             `;
             tabelaBody.appendChild(tr);
@@ -321,14 +385,17 @@
 
     function renderRendas() {
         rendasLista.innerHTML = "";
-        rendas.forEach((r,i) => {
+        rendas.forEach((r, i) => {
             const div = document.createElement("div");
             div.className = "d-flex justify-content-between align-items-center mb-2";
+            const nome = (r && r.nome) ? r.nome : "";
+            const valor = Number(r && r.valor ? r.valor : 0).toFixed(2);
+
             div.innerHTML = `
-                <div contenteditable="true" oninput="__edRen(${i},'nome',this.innerText)">${r.nome}</div>
+                <div contenteditable="true" oninput="window.__edRen(${i}, 'nome', this.innerText)">${escapeHtml(nome)}</div>
                 <div>
-                    <span contenteditable="true" oninput="__edRen(${i},'valor',this.innerText)">${Number(r.valor).toFixed(2)}</span>
-                    <button class="btn btn-danger btn-sm ms-2" onclick="__rmRen(${i})"><i class="bi bi-trash"></i></button>
+                    <span contenteditable="true" oninput="window.__edRen(${i}, 'valor', this.innerText)">${valor}</span>
+                    <button class="btn btn-danger btn-sm ms-2" onclick="window.__rmRen(${i})"><i class="bi bi-trash"></i></button>
                 </div>
             `;
             rendasLista.appendChild(div);
@@ -336,69 +403,87 @@
         atualizarTotais();
     }
 
-    /* GLOBAL EDIT */
-    window.__edDeb = (i,c,v)=>{
-        if (c === "valor") v = parseFloat(v.replace(",", ".")) || 0;
+    function escapeHtml(str) {
+        return String(str)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;");
+    }
+
+    /* INLINE EDIT */
+    window.__edDeb = (i, c, v) => {
+        if (!debitos[i]) return;
+        if (c === "valor") v = parseFloat(String(v).replace(",", ".")) || 0;
         debitos[i][c] = v;
+        atualizarTotais();
         salvarMes();
     };
-    window.__rmDeb = (i)=>{ debitos.splice(i,1); salvarMes(); renderDebitos(); };
 
-    window.__edRen = (i,c,v)=>{
-        if (c === "valor") v = parseFloat(v.replace(",", ".")) || 0;
-        rendas[i][c] = v;
-        salvarMes();
-    };
-    window.__rmRen = (i)=>{ rendas.splice(i,1); salvarMes(); renderRendas(); };
-
-    /* TOTAIS */
-    function formatBRL(v) {
-        return (Number(v) || 0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-    }
-
-    function atualizarTotais() {
-        const ts = debitos.reduce((s,d)=>s + Number(d.valor||0),0);
-        const tr = rendas.reduce((s,r)=>s + Number(r.valor||0),0);
-        const saldo = tr - ts;
-
-        document.getElementById("totalSaida").innerText = formatBRL(ts);
-        document.getElementById("totalRendas").innerText = formatBRL(tr);
-        document.getElementById("resumoSaida").innerText = formatBRL(ts);
-        document.getElementById("resumoRendas").innerText = formatBRL(tr);
-        document.getElementById("saldoFinal").innerText = formatBRL(saldo);
-
-        const el = document.getElementById("saldoFinal");
-        el.classList.toggle("text-danger", saldo < 0);
-        el.classList.toggle("text-success", saldo >= 0);
-    }
-
-    /* EVENTOS */
-    document.getElementById("addDebitoBtn").onclick = ()=>{
-        debitos.push({nome:"Novo Débito", valor:0});
+    window.__rmDeb = (i) => {
+        debitos.splice(i, 1);
         salvarMes();
         renderDebitos();
     };
 
-    document.getElementById("addRendaBtn").onclick = ()=>{
-        rendas.push({nome:"Nova Renda", valor:0});
+    window.__edRen = (i, c, v) => {
+        if (!rendas[i]) return;
+        if (c === "valor") v = parseFloat(String(v).replace(",", ".")) || 0;
+        rendas[i][c] = v;
+        atualizarTotais();
+        salvarMes();
+    };
+
+    window.__rmRen = (i) => {
+        rendas.splice(i, 1);
         salvarMes();
         renderRendas();
     };
 
-    document.getElementById("newMonthBtn").onclick = criarNovoMes;
-    document.getElementById("duplicateBtn").onclick = duplicarMes;
+    /* TOTAIS */
+    function atualizarTotais() {
+        const totalSaidaVal = debitos.reduce((acc, d) => acc + (Number(d.valor) || 0), 0);
+        const totalRendasVal = rendas.reduce((acc, r) => acc + (Number(r.valor) || 0), 0);
+        const saldoVal = totalRendasVal - totalSaidaVal;
 
-    document.getElementById("logoutBtn").onclick = async ()=>{
+        totalSaidaFooter.innerText = formatBRL(totalSaidaVal);
+        totalRendasEl.innerText = formatBRL(totalRendasVal);
+        resumoSaidaEl.innerText = formatBRL(totalSaidaVal);
+        resumoRendasEl.innerText = formatBRL(totalRendasVal);
+        saldoFinalEl.innerText = formatBRL(saldoVal);
+
+        saldoFinalEl.classList.toggle("text-danger", saldoVal < 0);
+        saldoFinalEl.classList.toggle("text-success", saldoVal >= 0);
+    }
+
+    /* BOTÕES */
+    document.getElementById("addDebitoBtn").onclick = () => {
+        debitos.push({ nome: "Novo Débito", valor: 0 });
+        salvarMes();
+        renderDebitos();
+    };
+
+    document.getElementById("addRendaBtn").onclick = () => {
+        rendas.push({ nome: "Nova Renda", valor: 0 });
+        salvarMes();
+        renderRendas();
+    };
+
+    newMonthBtn.onclick = criarNovoMes;
+    duplicateBtn.onclick = duplicarMes;
+
+    logoutBtn.onclick = async () => {
         await signOut(auth);
         window.location.href = "login.html";
     };
 
-    monthSelect.onchange = async ()=>{
+    monthSelect.onchange = async () => {
+        const key = monthSelect.value;
+        if (!key) return;
         await salvarMes();
-        await carregarMes(monthSelect.value);
+        await carregarMes(key);
     };
 
-    /* LOGIN OK → CARREGAR DADOS */
+    /* LOGIN FLOW */
     onAuthStateChanged(auth, async user => {
         if (!user) return;
         usuarioId = user.uid;
@@ -408,10 +493,11 @@
         if (availableMonths.length === 0) {
             const hoje = new Date();
             const y = hoje.getFullYear();
-            const m = String(hoje.getMonth()+1).padStart(2,"0");
-            currentMonthKey = `${y}-${m}`;
+            const m = String(hoje.getMonth() + 1).padStart(2, "0");
+            const chave = `${y}-${m}`;
             debitos = [];
             rendas = [];
+            currentMonthKey = chave;
             await salvarMes();
             await carregarListaMeses();
         }
@@ -421,6 +507,5 @@
     });
 
 </script>
-
 </body>
 </html>

@@ -220,3 +220,113 @@ table td, table th {
         font-size: 14px !important;
     }
 }
+
+
+/* -------------------------------------------------- */
+/* CONTENTEDITABLE FIX                                 */
+/* -------------------------------------------------- */
+[contenteditable="true"] {
+    outline: none;
+    min-width: 60px;
+    display: inline-block;
+}
+td[contenteditable="true"], div[contenteditable="true"], span[contenteditable="true"] {
+    padding: 4px;
+}
+
+/* Layout do painel principal (segunda def duplicada — mantido) */
+.main-wrapper {
+    padding: 24px;
+    max-width: 1100px;
+    margin: 90px auto 60px;
+}
+
+/* -------------------------------------------------- */
+/* IMAGEM DO PORQUINHO                                 */
+/* -------------------------------------------------- */
+.resumo-box {
+    background: #eef6ff;
+    border-left: 4px solid #6fb0ff;
+    min-height: 120px;
+    position: relative;
+    overflow: visible;
+}
+
+.resumo-box .resumo-content {
+    padding-right: 260px;
+}
+
+.resumo-box .resumo-img {
+    position: absolute;
+    display: block;
+    margin: 10px auto 0;
+    max-width: 1100px;
+    right: 85px;
+    left: 455px;
+    bottom: -257px;
+    pointer-events: none; /* <-- IMPORTANTE */
+}
+
+/* -------------------------------------------------- */
+/* IMAGEM MENININHA                                    */
+/* -------------------------------------------------- */
+.affirm-box {
+    background: #ffeef6;
+    border-radius: 8px;
+    padding: 18px;
+    position: relative;
+}
+
+.affirm-list .affirm-item {
+    background: #fff0f6;
+    border: 1px solid rgba(255,20,147,0.08);
+    border-left: 6px solid rgba(255,20,147,0.12);
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+
+.menininha-img {
+    position: absolute;
+    display: block;
+    margin: 12px auto 0;
+    max-width: 850px;
+    right: 0px;
+    left: -235px;
+    bottom: -145px;
+    pointer-events: none; /* <-- IMPORTANTE */
+}
+
+/* Rendas box style (decorative) */
+.renda-card {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Melhor visual das células contenteditable */
+tbody td[contenteditable="true"], div[contenteditable="true"] {
+    background: transparent;
+    min-height: 22px;
+}
+
+/* footer total */
+tfoot tr td {
+    vertical-align: middle;
+}
+
+/* -------------------------------------------------- */
+/* FIX FINAL – BOTÕES CLICÁVEIS                        */
+/* -------------------------------------------------- */
+
+button,
+.btn,
+.form-select,
+table,
+#addDebitoBtn,
+#addRendaBtn,
+#newMonthBtn,
+#duplicateBtn,
+#monthSelect {
+    position: relative;
+    z-index: 10;
+}
