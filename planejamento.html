@@ -270,9 +270,10 @@
     const totalSaidaFooter = document.getElementById("totalSaida");
     const totalRendasEl = document.getElementById("totalRendas");
 
-    /* FIRESTORE PATH HELPERS (caminho correto em profundidade) */
-    const colMeses = (uid) => collection(db, "usuarios", uid, "planejamento", "meses");
-    const docMes = (uid, key) => doc(db, "usuarios", uid, "planejamento", "meses", key);
+    /* FIRESTORE PATH HELPERS (correto: coleção 'planejamento' sob o documento do usuário) */
+    // collection(db, "usuarios", uid, "planejamento") => segmentos: usuarios (col) / uid (doc) / planejamento (col) -> OK
+    const colMeses = (uid) => collection(db, "usuarios", uid, "planejamento");
+    const docMes = (uid, key) => doc(db, "usuarios", uid, "planejamento", key);
 
     /* -------------------------
        LÊ LISTA DE MESES
@@ -286,6 +287,7 @@
             atualizarSelect();
         } catch (err) {
             console.error("Erro ao listar meses:", err);
+            // mostrar no console do usuário (útil para debugging)
         }
     }
 
