@@ -10,8 +10,59 @@
     <!-- Ícones Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
+    <!-- Material Icons (opção E escolhida) -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
     <!-- Seu CSS externo -->
     <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        /* Pequenos ajustes locais para inputs na tabela (mantém layout atual) */
+        .table td input[type="number"]{
+            width: 110px;
+        }
+        .table td input[type="text"]{
+            width: 100%;
+            min-width: 120px;
+            border: none;
+            background: transparent;
+            padding: 0;
+        }
+        .table td input[type="text"]:focus,
+        .table td input[type="number"]:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        .checkbox-center {
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+
+        /* Evita que imagens decorativas capturem cliques */
+        .resumo-img,
+        .menininha-img {
+            pointer-events: none;
+        }
+
+        /* coluna do ícone check minimalista */
+        .col-check-icon {
+            font-size: 20px;
+            text-align: center;
+            color: #1aab2a;
+        }
+
+        /* melhora aparencia do input dentro da celula */
+        .table td .form-control-sm {
+            padding: .25rem .5rem;
+            height: calc(1.5em + .5rem);
+        }
+
+        /* responsividade - garante overflow da tabela */
+        .table-responsive {
+            overflow-x: auto;
+        }
+    </style>
 </head>
 <body>
 
@@ -83,7 +134,7 @@
     </div>
 
     <div class="row mt-4">
-        <!-- ESQUERDA - TABELA -->
+        <!-- ESQUERDA - TABELA DÉBITOS -->
         <div class="col-md-8">
             <div class="d-flex justify-content-between mb-2">
                 <h4 class="fw-bold">Débitos</h4>
@@ -92,24 +143,28 @@
                 </button>
             </div>
 
-            <table class="table table-bordered shadow-sm" id="tabelaDebitos">
-                <thead>
-                <tr>
-                    <th>Débito</th>
-                    <th>Valor (R$)</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody></tbody>
+            <div class="table-responsive">
+                <table class="table table-bordered shadow-sm" id="tabelaDebitos">
+                    <thead>
+                    <tr>
+                        <th>Descrição</th>
+                        <th style="width:120px">Valor (R$)</th>
+                        <th style="width:120px">Falta (R$)</th>
+                        <th style="width:80px" class="text-center">Pago</th>
+                        <th style="width:60px" class="col-check-icon">✔</th>
+                        <th style="width:60px"></th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
 
-                <tfoot>
-                <tr class="table-warning fw-bold">
-                    <td>Total</td>
-                    <td id="totalSaida">R$ 0,00</td>
-                    <td></td>
-                </tr>
-                </tfoot>
-            </table>
+                    <tfoot>
+                    <tr class="table-warning fw-bold">
+                        <td>Total</td>
+                        <td id="totalSaida" colspan="5">R$ 0,00</td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
         </div>
 
         <!-- DIREITA - RENDAS -->
@@ -167,7 +222,9 @@
         setDoc
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    /* UTILITÁRIOS */
+    /* -------------------------
+       UTILITÁRIOS E ESTADO
+    ------------------------- */
     const auth = getAuth(app);
 
     const MONTH_NAMES = [
@@ -178,7 +235,7 @@
     function labelFromKey(key){
         if(!key) return "";
         const [y,m] = key.split("-");
-        return `${MONTH_NAMES[Number(m)-1]} / ${y}`;
+        return `${MONTH_NAMES[Number(m)-1] || m} / ${y}`;
     }
 
     function prevMonthKey(key) {
@@ -193,7 +250,6 @@
         return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     }
 
-    /* ESTADO */
     let usuarioId = null;
     let availableMonths = [];
     let currentMonthKey = null;
@@ -214,11 +270,13 @@
     const totalSaidaFooter = document.getElementById("totalSaida");
     const totalRendasEl = document.getElementById("totalRendas");
 
-    /* FIRESTORE HELPERS — CORRIGIDO */
-    const colMeses = (uid) => collection(db, "usuarios", uid, "planejamento/meses");
-    const docMes = (uid, key) => doc(db, "usuarios", uid, `planejamento/meses/${key}`);
+    /* FIRESTORE PATH HELPERS (caminho correto em profundidade) */
+    const colMeses = (uid) => collection(db, "usuarios", uid, "planejamento", "meses");
+    const docMes = (uid, key) => doc(db, "usuarios", uid, "planejamento", "meses", key);
 
-    /* LISTAR MESES */
+    /* -------------------------
+       LÊ LISTA DE MESES
+    ------------------------- */
     async function carregarListaMeses() {
         try {
             const snap = await getDocs(colMeses(usuarioId));
@@ -232,6 +290,7 @@
     }
 
     function atualizarSelect(){
+        const previous = monthSelect.value;
         monthSelect.innerHTML = "";
 
         const placeholder = document.createElement("option");
@@ -250,14 +309,18 @@
             monthSelect.value = currentMonthKey;
         } else if (availableMonths.length > 0) {
             monthSelect.value = availableMonths[availableMonths.length - 1];
+        } else {
+            monthSelect.value = "";
         }
 
-        if (monthSelect.value) {
-            carregarMes(monthSelect.value);
+        if (monthSelect.value && monthSelect.value !== previous) {
+            carregarMes(monthSelect.value).catch(console.error);
         }
     }
 
-    /* CARREGAR MÊS */
+    /* -------------------------
+       CARREGA MÊS (sem sobrescrever wrapper visual)
+    ------------------------- */
     async function carregarMes(key) {
         try {
             if (!key) {
@@ -271,17 +334,26 @@
             }
 
             const snap = await getDoc(docMes(usuarioId, key));
-
             if (snap.exists()) {
                 const data = snap.data();
-                debitos = data.debitos || [];
-                rendas = data.rendas || [];
+                debitos = Array.isArray(data.debitos) ? data.debitos : [];
+                // normaliza estrutura de cada débito
+                debitos = debitos.map(d => {
+                    return {
+                        nome: d && typeof d.nome !== "undefined" ? d.nome : "",
+                        valor: Number(d && d.valor ? d.valor : 0),
+                        falta: typeof d?.falta !== "undefined" ? Number(d.falta) : Number(d && d.valor ? d.valor : 0),
+                        pago: Boolean(d && d.pago) || (Number(d?.falta ?? d?.valor ?? 0) === 0)
+                    };
+                });
+                rendas = Array.isArray(data.rendas) ? data.rendas : [];
             } else {
                 debitos = [];
                 rendas = [];
             }
 
             currentMonthKey = key;
+            atualizarSelect();
             renderDebitos();
             renderRendas();
             atualizarTotais();
@@ -290,30 +362,32 @@
         }
     }
 
-    /* SALVAR */
+    /* -------------------------
+       SALVA MÊS
+    ------------------------- */
     async function salvarMes() {
         if (!usuarioId || !currentMonthKey) return;
-
         try {
             await setDoc(docMes(usuarioId, currentMonthKey), {
                 debitos,
                 rendas,
                 updatedAt: new Date().toISOString()
             });
-
+            // atualiza lista sem sobrescrever seleção atual
             await carregarListaMeses();
         } catch (err) {
             console.error("Erro ao salvar mês:", err);
         }
     }
 
-    /* NOVO MÊS */
+    /* -------------------------
+       CRIAR NOVO MÊS (prompt), valida e salva
+    ------------------------- */
     async function criarNovoMes() {
         const mes = prompt("Informe o mês (YYYY-MM):");
         if (!mes) return;
-
         if (!/^\d{4}-\d{2}$/.test(mes)) {
-            alert("Formato inválido.");
+            alert("Formato inválido. Use YYYY-MM.");
             return;
         }
 
@@ -323,89 +397,163 @@
 
         await salvarMes();
         await carregarMes(mes);
-
         alert("Mês criado com sucesso.");
     }
 
-    /* DUPLICAR */
+    /* -------------------------
+       DUPLICAR MÊS
+    ------------------------- */
     async function duplicarMes() {
-        const destino = prompt("Duplicar para qual mês? (YYYY-MM):", currentMonthKey || "");
+        const destino = prompt("Para qual mês deseja duplicar? (YYYY-MM):", currentMonthKey || "");
         if (!destino) return;
-
-        if (!/^\d{4}-\d{2}$/.test(destino)) return alert("Formato inválido.");
+        if (!/^\d{4}-\d{2}$/.test(destino)) { alert("Formato inválido."); return; }
 
         const origem = prevMonthKey(destino);
+        try {
+            const snap = await getDoc(docMes(usuarioId, origem));
+            if (!snap.exists()) { alert("Mês anterior não existe."); return; }
+            const data = snap.data();
+            debitos = JSON.parse(JSON.stringify(data.debitos || []));
+            rendas = JSON.parse(JSON.stringify(data.rendas || []));
+            currentMonthKey = destino;
 
-        const snap = await getDoc(docMes(usuarioId, origem));
-        if (!snap.exists()) return alert("Mês anterior não existe.");
-
-        const data = snap.data();
-        debitos = structuredClone(data.debitos || []);
-        rendas = structuredClone(data.rendas || []);
-
-        currentMonthKey = destino;
-
-        await salvarMes();
-        await carregarMes(destino);
-
-        alert("Duplicado com sucesso!");
+            await salvarMes();
+            await carregarMes(destino);
+            alert("Mês duplicado com sucesso.");
+        } catch (err) {
+            console.error("Erro ao duplicar:", err);
+            alert("Erro ao duplicar mês. Veja console.");
+        }
     }
 
-    /* RENDER */
+    /* -------------------------
+       RENDERIZAÇÃO DÉBITOS (tabela)
+    ------------------------- */
     function renderDebitos() {
         tabelaBody.innerHTML = "";
-
         debitos.forEach((d, i) => {
+            // garantia de campos
+            d.nome = d.nome || "";
+            d.valor = Number(d.valor || 0);
+            d.falta = typeof d.falta !== "undefined" ? Number(d.falta) : d.valor;
+            d.pago = Boolean(d.pago);
+
             const tr = document.createElement("tr");
 
+            // note: escapeHtml para evitar injeção em value
             tr.innerHTML = `
-                <td contenteditable="true" oninput="window.__edDeb(${i},'nome',this.innerText)">${escapeHtml(d.nome || "")}</td>
-                <td contenteditable="true" oninput="window.__edDeb(${i},'valor',this.innerText)">${(d.valor || 0).toFixed(2)}</td>
-                <td class="text-center">
+                <td>
+                    <input type="text" class="form-control form-control-sm" value="${escapeHtml(String(d.nome))}"
+                           oninput="window.__edDeb(${i}, 'nome', this.value)">
+                </td>
+
+                <td class="align-middle">
+                    <input type="number" class="form-control form-control-sm" step="0.01" min="0" value="${(Number(d.valor)||0).toFixed(2)}"
+                        onchange="window.__edDeb(${i}, 'valor', this.value)">
+                </td>
+
+                <td class="align-middle">
+                    <input type="number" class="form-control form-control-sm" step="0.01" min="0" value="${(Number(d.falta)||0).toFixed(2)}"
+                        onchange="window.__edDeb(${i}, 'falta', this.value)">
+                </td>
+
+                <td class="checkbox-center align-middle">
+                    <input type="checkbox" ${d.pago ? "checked" : ""} onchange="window.__togglePago(${i}, this.checked)">
+                </td>
+
+                <td class="col-check-icon align-middle">
+                    ${d.pago ? '<span class="material-icons" aria-hidden="true" title="Pago">done</span>' : ''}
+                </td>
+
+                <td class="text-center align-middle">
                     <button class="btn btn-danger btn-sm" onclick="window.__rmDeb(${i})"><i class="bi bi-trash"></i></button>
                 </td>
             `;
-
             tabelaBody.appendChild(tr);
         });
 
         atualizarTotais();
     }
 
+    /* -------------------------
+       RENDER RENDAS (mantido)
+    ------------------------- */
     function renderRendas() {
         rendasLista.innerHTML = "";
-
         rendas.forEach((r, i) => {
             const div = document.createElement("div");
-
             div.className = "d-flex justify-content-between align-items-center mb-2";
-
+            const nome = (r && r.nome) ? r.nome : "";
+            const valor = Number(r && r.valor ? r.valor : 0).toFixed(2);
             div.innerHTML = `
-                <div contenteditable="true" oninput="window.__edRen(${i},'nome',this.innerText)">${escapeHtml(r.nome || "")}</div>
+                <div contenteditable="true" oninput="window.__edRen(${i}, 'nome', this.innerText)">${escapeHtml(nome)}</div>
                 <div>
-                    <span contenteditable="true" oninput="window.__edRen(${i},'valor',this.innerText)">${(r.valor || 0).toFixed(2)}</span>
+                    <span contenteditable="true" oninput="window.__edRen(${i}, 'valor', this.innerText)">${valor}</span>
                     <button class="btn btn-danger btn-sm ms-2" onclick="window.__rmRen(${i})"><i class="bi bi-trash"></i></button>
                 </div>
             `;
-
             rendasLista.appendChild(div);
         });
-
         atualizarTotais();
     }
 
+    /* -------------------------
+       ESCAPE
+    ------------------------- */
     function escapeHtml(str) {
         return String(str)
             .replaceAll("&", "&amp;")
             .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;");
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;");
     }
 
-    /* INLINE EDIT */
-    window.__edDeb = (i, c, v) => {
-        if (c === "valor") v = parseFloat(v.replace(",", ".")) || 0;
-        debitos[i][c] = v;
-        atualizarTotais();
+    /* -------------------------
+       OPERACOES INLINE DÉBITOS
+    ------------------------- */
+    window.__edDeb = (i, campo, v) => {
+        if (!debitos[i]) return;
+        if (campo === "valor" || campo === "falta") {
+            const num = parseFloat(String(v).replace(",", ".")) || 0;
+            debitos[i][campo] = num;
+
+            // regras:
+            // - se falta === 0 => pago true
+            // - se falta > 0 => pago false
+            if (campo === "falta") {
+                debitos[i].pago = Number(num) === 0;
+            }
+
+            // não permitir falta > valor
+            if (debitos[i].falta > debitos[i].valor) {
+                debitos[i].falta = debitos[i].valor;
+            }
+
+            // se alterou valor e falta era maior que novo valor, ajustar falta
+            if (campo === "valor" && debitos[i].falta > debitos[i].valor) {
+                debitos[i].falta = debitos[i].valor;
+                if (debitos[i].falta === 0) debitos[i].pago = true;
+            }
+
+        } else {
+            debitos[i][campo] = v;
+        }
+
+        // re-render e salva
+        renderDebitos();
+        salvarMes();
+    };
+
+    window.__togglePago = (i, checked) => {
+        if (!debitos[i]) return;
+        debitos[i].pago = Boolean(checked);
+        if (debitos[i].pago) {
+            debitos[i].falta = 0;
+        } else {
+            // se desmarcou, assume que falta é o valor total
+            debitos[i].falta = Number(debitos[i].valor || 0);
+        }
+        renderDebitos();
         salvarMes();
     };
 
@@ -415,8 +563,12 @@
         salvarMes();
     };
 
+    /* -------------------------
+       RENDAS INLINE
+    ------------------------- */
     window.__edRen = (i, c, v) => {
-        if (c === "valor") v = parseFloat(v.replace(",", ".")) || 0;
+        if (!rendas[i]) return;
+        if (c === "valor") v = parseFloat(String(v).replace(",", ".")) || 0;
         rendas[i][c] = v;
         atualizarTotais();
         salvarMes();
@@ -424,29 +576,42 @@
 
     window.__rmRen = (i) => {
         rendas.splice(i, 1);
-        renderRendas();
         salvarMes();
+        renderRendas();
     };
 
-    /* TOTAIS */
+    /* -------------------------
+       TOTAIS
+    ------------------------- */
     function atualizarTotais() {
-        const tS = debitos.reduce((acc, d) => acc + (Number(d.valor) || 0), 0);
-        const tR = rendas.reduce((acc, r) => acc + (Number(r.valor) || 0), 0);
-        const saldo = tR - tS;
+        // total de saída = soma do (valor - falta) = efetivamente pago
+        const totalSaidaVal = debitos.reduce((acc, d) => {
+            const valor = Number(d.valor || 0);
+            const falta = Number(d.falta || 0);
+            const pago = valor - falta;
+            return acc + Math.max(0, Number(pago));
+        }, 0);
 
-        totalSaidaFooter.innerText = formatBRL(tS);
-        totalRendasEl.innerText = formatBRL(tR);
-        resumoSaidaEl.innerText = formatBRL(tS);
-        resumoRendasEl.innerText = formatBRL(tR);
-        saldoFinalEl.innerText = formatBRL(saldo);
+        const totalRendasVal = rendas.reduce((acc, r) => acc + (Number(r.valor) || 0), 0);
+        const saldoVal = totalRendasVal - totalSaidaVal;
 
-        saldoFinalEl.classList.toggle("text-danger", saldo < 0);
-        saldoFinalEl.classList.toggle("text-success", saldo >= 0);
+        totalSaidaFooter.innerText = formatBRL(totalSaidaVal);
+        totalRendasEl.innerText = formatBRL(totalRendasVal);
+        resumoSaidaEl.innerText = formatBRL(totalSaidaVal);
+        resumoRendasEl.innerText = formatBRL(totalRendasVal);
+        saldoFinalEl.innerText = formatBRL(saldoVal);
+
+        saldoFinalEl.classList.toggle("text-danger", saldoVal < 0);
+        saldoFinalEl.classList.toggle("text-success", saldoVal >= 0);
     }
 
-    /* BOTÕES */
+    /* -------------------------
+       EVENTOS BOTOES
+    ------------------------- */
     document.getElementById("addDebitoBtn").onclick = () => {
-        debitos.push({ nome: "Novo Débito", valor: 0 });
+        // por padrão, nova conta não está paga e falta == valor
+        const novo = { nome: "Novo Débito", valor: 0, falta: 0, pago: true };
+        debitos.push(novo);
         renderDebitos();
         salvarMes();
     };
@@ -466,13 +631,16 @@
     };
 
     monthSelect.onchange = async () => {
-        if (monthSelect.value) {
-            await salvarMes();
-            await carregarMes(monthSelect.value);
-        }
+        const key = monthSelect.value;
+        if (!key) return;
+        await salvarMes();
+        await carregarMes(key);
     };
 
-    /* LOGIN FLOW */
+    /* -------------------------
+       LOGIN FLOW (onAuth)
+       cria mês atual automaticamente se não houver meses
+    ------------------------- */
     onAuthStateChanged(auth, async user => {
         if (!user) return;
         usuarioId = user.uid;
@@ -483,17 +651,22 @@
             const hoje = new Date();
             const y = hoje.getFullYear();
             const m = String(hoje.getMonth() + 1).padStart(2, "0");
+            const chave = `${y}-${m}`;
 
-            currentMonthKey = `${y}-${m}`;
             debitos = [];
             rendas = [];
+            currentMonthKey = chave;
 
+            // salva o documento para o usuário (cria subcoleção automaticamente)
             await salvarMes();
             await carregarListaMeses();
         }
 
+        // seleciona o último mês (mais recente)
         currentMonthKey = availableMonths[availableMonths.length - 1];
-        await carregarMes(currentMonthKey);
+        if (currentMonthKey) {
+            await carregarMes(currentMonthKey);
+        }
     });
 
 </script>
