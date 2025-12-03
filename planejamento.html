@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <title>Planejamento Financeiro</title>
@@ -10,29 +11,31 @@
     <!-- Ícones Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- SEU CSS -->
+    <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
-<!-- 🔐 PROTEÇÃO DE LOGIN (colocada no topo) -->
+<!-- ======================== -->
+<!-- PROTEÇÃO DE LOGIN        -->
+<!-- ======================== -->
 <script type="module">
-    import app, { db } from "./firebase.js";
+    import app from "./firebase.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const auth = getAuth(app);
 
-    // redireciona para login caso não esteja logado
     onAuthStateChanged(auth, (user) => {
         if (!user) {
             window.location.href = "login.html";
         }
     });
 </script>
-<!-- 🔐 FIM PROTEÇÃO -->
 
-<!-- NAVBAR -->
+<!-- ======================== -->
+<!-- NAVBAR                   -->
+<!-- ======================== -->
 <nav class="navbar navbar-expand-lg fixed-top custom-navbar bg-white shadow-sm">
     <div class="container-fluid">
 
@@ -48,35 +51,11 @@
         <div class="collapse navbar-collapse" id="menu">
             <ul class="navbar-nav ms-auto">
 
-                <li class="nav-item">
-                    <a class="nav-link" href="index.html">
-                        <i class="bi bi-house-door"></i> Início
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link active" href="planejamento.html">
-                        <i class="bi bi-cash-stack"></i> Planejamento
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="praia.html">
-                        <i class="bi bi-sun"></i> Praia
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="atrasadas.html">
-                        <i class="bi bi-exclamation-triangle"></i> Atrasadas
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="calendario.html">
-                        <i class="bi bi-calendar3"></i> Calendário
-                    </a>
-                </li>
+                <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house-door"></i> Início</a></li>
+                <li class="nav-item"><a class="nav-link active" href="planejamento.html"><i class="bi bi-cash-stack"></i> Planejamento</a></li>
+                <li class="nav-item"><a class="nav-link" href="praia.html"><i class="bi bi-sun"></i> Praia</a></li>
+                <li class="nav-item"><a class="nav-link" href="atrasadas.html"><i class="bi bi-exclamation-triangle"></i> Atrasadas</a></li>
+                <li class="nav-item"><a class="nav-link" href="calendario.html"><i class="bi bi-calendar3"></i> Calendário</a></li>
 
                 <li class="nav-item ms-3">
                     <button id="logoutBtn" class="btn btn-danger btn-sm">Sair</button>
@@ -88,24 +67,20 @@
     </div>
 </nav>
 
-<!-- CONTEÚDO PRINCIPAL -->
+<!-- ======================== -->
+<!-- CONTEÚDO PRINCIPAL       -->
+<!-- ======================== -->
 <div class="main-wrapper mt-5">
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1>Planejamento Financeiro</h1>
 
-        <!-- seletor de mês + duplicar -->
         <div class="d-flex align-items-center gap-2">
             <label class="mb-0 me-1">Planejamento —</label>
             <select id="monthSelect" class="form-select form-select-sm" style="width:220px;"></select>
 
-            <button id="newMonthBtn" class="btn btn-outline-secondary btn-sm" title="Criar mês vazio">
-                Novo mês
-            </button>
-
-            <button id="duplicateBtn" class="btn btn-outline-primary btn-sm" title="Duplicar mês anterior">
-                Duplicar
-            </button>
+            <button id="newMonthBtn" class="btn btn-outline-secondary btn-sm">Novo mês</button>
+            <button id="duplicateBtn" class="btn btn-outline-primary btn-sm">Duplicar</button>
         </div>
     </div>
 
@@ -120,9 +95,8 @@
 
     <div class="row mt-4">
 
-        <!-- ESQUERDA - TABELA -->
+        <!-- Débitos -->
         <div class="col-md-8">
-
             <div class="d-flex justify-content-between mb-2">
                 <h4 class="fw-bold">Débitos</h4>
                 <button class="btn btn-primary btn-sm" id="addDebitoBtn">
@@ -150,42 +124,30 @@
             </table>
         </div>
 
-        <!-- DIREITA - RENDAS + AFIRMAÇÕES -->
+        <!-- Coluna direita -->
         <div class="col-md-4">
 
+            <!-- Rendas -->
             <div class="card renda-card shadow-sm mb-4">
                 <div class="card-body">
                     <h4 class="fw-bold d-flex justify-content-between">
                         Rendas
-                        <button class="btn btn-success btn-sm" id="addRendaBtn">
-                            <i class="bi bi-plus-circle"></i>
-                        </button>
+                        <button class="btn btn-success btn-sm" id="addRendaBtn"><i class="bi bi-plus-circle"></i></button>
                     </h4>
 
                     <div id="rendasLista"></div>
 
-                    <!-- Total -->
-                    <p class="fw-bold mt-3">Total de Entradas:
-                        <span id="totalRendas" class="text-success">R$ 0,00</span>
-                    </p>
+                    <p class="fw-bold mt-3">Total de Entradas: <span id="totalRendas" class="text-success">R$ 0,00</span></p>
                 </div>
             </div>
 
-            <!-- QUADRADO ROSA -->
+            <!-- Afirmações -->
             <div class="affirm-box mt-3">
                 <h5 class="affirm-title">✨ Afirmações Positivas</h5>
 
-                <div class="affirm-item">
-                    "A prosperidade começa na mente. Cultive pensamentos positivos e veja sua realidade se transformar."
-                </div>
-
-                <div class="affirm-item">
-                    "Sou merecedora de toda a abundância que o universo tem para me oferecer."
-                </div>
-
-                <div class="affirm-item">
-                    "A prosperidade flui livremente em minha vida com leveza."
-                </div>
+                <div class="affirm-item">"A prosperidade começa na mente."</div>
+                <div class="affirm-item">"Sou merecedora de abundância."</div>
+                <div class="affirm-item">"A prosperidade flui livremente."</div>
 
                 <img src="img/planejamento1.png" class="img-affirm-decor">
             </div>
@@ -195,12 +157,14 @@
 
 </div>
 
+<!-- Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- ======================================================= -->
-<!-- SCRIPT COMPLETO — PLANEJAMENTO (OPÇÃO A)                -->
-<!-- ======================================================= -->
+<!-- =============================== -->
+<!-- SCRIPT COMPLETO DO SISTEMA      -->
+<!-- =============================== -->
 <script type="module">
+
     import app, { db } from "./firebase.js";
     import {
         getAuth,
@@ -218,17 +182,12 @@
 
     const auth = getAuth(app);
 
-    /* ---------------------------------------- */
-    /* NOMES DOS MESES                          */
-    /* ---------------------------------------- */
-    const MONTH_NAMES = [
-        "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
-        "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
-    ];
+    /* MESES */
+    const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
     function labelFromKey(key) {
         const [y,m] = key.split("-");
-        return `${MONTH_NAMES[Number(m)-1]} / ${y}`;
+        return `${MONTHS[Number(m)-1]} / ${y}`;
     }
 
     function prevMonthKey(key) {
@@ -238,39 +197,23 @@
         return `${y}-${String(m).padStart(2,"0")}`;
     }
 
-    /* ---------------------------------------- */
-    /* VARIÁVEIS GLOBAIS                        */
-    /* ---------------------------------------- */
+    /* VARIÁVEIS */
     let usuarioId = null;
     let availableMonths = [];
     let currentMonthKey = null;
-
     let debitos = [];
     let rendas = [];
 
-    /* ---------------------------------------- */
-    /* ELEMENTOS DOM                            */
-    /* ---------------------------------------- */
+    /* FIRESTORE PATH */
+    const colMeses = (uid) => collection(db, "usuarios", uid, "planejamento", "meses");
+    const docMes = (uid, key) => doc(db, "usuarios", uid, "planejamento", "meses", key);
+
+    /* ELEMENTOS */
     const tabelaBody = document.querySelector("#tabelaDebitos tbody");
     const rendasLista = document.getElementById("rendasLista");
     const monthSelect = document.getElementById("monthSelect");
-    const newMonthBtn = document.getElementById("newMonthBtn");
-    const duplicateBtn = document.getElementById("duplicateBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
 
-    /* ---------------------------------------- */
-    /* FIRESTORE PATH — OPÇÃO A                 */
-    /* ---------------------------------------- */
-    function colMeses(uid) {
-        return collection(db, "usuarios", uid, "planejamento", "meses");
-    }
-    function docMes(uid, key) {
-        return doc(db, "usuarios", uid, "planejamento", "meses", key);
-    }
-
-    /* ---------------------------------------- */
-    /* LISTAR MESES DO FIRESTORE                */
-    /* ---------------------------------------- */
+    /* LISTAR MESES */
     async function carregarListaMeses() {
         const snap = await getDocs(colMeses(usuarioId));
         availableMonths = [];
@@ -279,29 +222,21 @@
         atualizarSelect();
     }
 
-    /* ---------------------------------------- */
-    /* ATUALIZAR SELECT                         */
-    /* ---------------------------------------- */
+    /* ATUALIZAR SELECT */
     function atualizarSelect() {
         monthSelect.innerHTML = "";
-
         availableMonths.forEach(key => {
             const op = document.createElement("option");
             op.value = key;
             op.textContent = labelFromKey(key);
             monthSelect.appendChild(op);
         });
-
         if (currentMonthKey) monthSelect.value = currentMonthKey;
     }
 
-    /* ---------------------------------------- */
-    /* CARREGAR MÊS                             */
-    /* ---------------------------------------- */
+    /* CARREGAR MÊS */
     async function carregarMes(key) {
-        const ref = docMes(usuarioId, key);
-        const snap = await getDoc(ref);
-
+        const snap = await getDoc(docMes(usuarioId, key));
         if (snap.exists()) {
             const data = snap.data();
             debitos = data.debitos || [];
@@ -310,7 +245,6 @@
             debitos = [];
             rendas = [];
         }
-
         currentMonthKey = key;
         atualizarSelect();
         renderDebitos();
@@ -318,14 +252,11 @@
         atualizarTotais();
     }
 
-    /* ---------------------------------------- */
-    /* SALVAR MÊS                               */
-    /* ---------------------------------------- */
+    /* SALVAR MÊS */
     async function salvarMes() {
         if (!usuarioId || !currentMonthKey) return;
 
-        const ref = docMes(usuarioId, currentMonthKey);
-        await setDoc(ref, {
+        await setDoc(docMes(usuarioId, currentMonthKey), {
             debitos,
             rendas,
             updatedAt: new Date().toISOString()
@@ -334,17 +265,11 @@
         await carregarListaMeses();
     }
 
-    /* ---------------------------------------- */
-    /* CRIAR NOVO MÊS (VAZIO)                   */
-    /* ---------------------------------------- */
+    /* NOVO MÊS */
     async function criarNovoMes() {
         const mes = prompt("Informe o mês (YYYY-MM):");
         if (!mes) return;
-
-        if (!/^\d{4}-\d{2}$/.test(mes)) {
-            alert("Formato inválido.");
-            return;
-        }
+        if (!/^\d{4}-\d{2}$/.test(mes)) return alert("Formato inválido.");
 
         debitos = [];
         rendas = [];
@@ -353,30 +278,18 @@
         await salvarMes();
         await carregarMes(mes);
 
-        alert("Mês criado com sucesso.");
+        alert("Mês criado!");
     }
 
-    /* ---------------------------------------- */
-    /* DUPLICAR MÊS ANTERIOR                    */
-    /* ---------------------------------------- */
+    /* DUPLICAR */
     async function duplicarMes() {
-        const destino = prompt("Para qual mês deseja duplicar? (YYYY-MM):", currentMonthKey);
-        if (!destino) return;
-
-        if (!/^\d{4}-\d{2}$/.test(destino)) {
-            alert("Formato inválido.");
-            return;
-        }
+        const destino = prompt("Duplicar para (YYYY-MM):", currentMonthKey);
+        if (!destino || !/^\d{4}-\d{2}$/.test(destino)) return;
 
         const origem = prevMonthKey(destino);
+        const snap = await getDoc(docMes(usuarioId, origem));
 
-        const srcRef = docMes(usuarioId, origem);
-        const snap = await getDoc(srcRef);
-
-        if (!snap.exists()) {
-            alert("O mês anterior não existe.");
-            return;
-        }
+        if (!snap.exists()) return alert("Mês anterior não existe.");
 
         const data = snap.data();
         debitos = JSON.parse(JSON.stringify(data.debitos || []));
@@ -386,252 +299,128 @@
         await salvarMes();
         await carregarMes(destino);
 
-        alert(`Mês ${labelFromKey(origem)} duplicado para ${labelFromKey(destino)}`);
+        alert("Mês duplicado!");
     }
 
-    /* ---------------------------------------- */
-    /* RENDERIZAÇÃO TABELAS                     */
-    /* ---------------------------------------- */
-
+    /* RENDERIZAÇÃO */
     function renderDebitos() {
         tabelaBody.innerHTML = "";
-
-        debitos.forEach((d, i) => {
+        debitos.forEach((d,i) => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
-                <td contenteditable="true" oninput="window.__edDeb(${i}, 'nome', this.innerText)">${d.nome}</td>
-                <td contenteditable="true" oninput="window.__edDeb(${i}, 'valor', this.innerText)">${Number(d.valor).toFixed(2)}</td>
+                <td contenteditable="true" oninput="__edDeb(${i},'nome',this.innerText)">${d.nome}</td>
+                <td contenteditable="true" oninput="__edDeb(${i},'valor',this.innerText)">${Number(d.valor).toFixed(2)}</td>
                 <td class="text-center">
-                    <button class="btn btn-danger btn-sm" onclick="window.__rmDeb(${i})">
-                        <i class="bi bi-trash"></i>
-                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="__rmDeb(${i})"><i class="bi bi-trash"></i></button>
                 </td>
             `;
             tabelaBody.appendChild(tr);
         });
-
         atualizarTotais();
     }
 
     function renderRendas() {
         rendasLista.innerHTML = "";
-
-        rendas.forEach((r, i) => {
+        rendas.forEach((r,i) => {
             const div = document.createElement("div");
             div.className = "d-flex justify-content-between align-items-center mb-2";
-
             div.innerHTML = `
-                <div contenteditable="true" oninput="window.__edRen(${i}, 'nome', this.innerText)">${r.nome}</div>
-
+                <div contenteditable="true" oninput="__edRen(${i},'nome',this.innerText)">${r.nome}</div>
                 <div>
-                    <span contenteditable="true" oninput="window.__edRen(${i}, 'valor', this.innerText)">
-                        ${Number(r.valor).toFixed(2)}
-                    </span>
-                    <button class="btn btn-danger btn-sm ms-2" onclick="window.__rmRen(${i})">
-                        <i class="bi bi-trash"></i>
-                    </button>
+                    <span contenteditable="true" oninput="__edRen(${i},'valor',this.innerText)">${Number(r.valor).toFixed(2)}</span>
+                    <button class="btn btn-danger btn-sm ms-2" onclick="__rmRen(${i})"><i class="bi bi-trash"></i></button>
                 </div>
             `;
             rendasLista.appendChild(div);
         });
-
         atualizarTotais();
     }
 
-    /* ---------------------------------------- */
-    /* FUNÇÕES GLOBAIS PARA EDITAR              */
-    /* ---------------------------------------- */
-    window.__edDeb = (i, c, v) => {
+    /* GLOBAL EDIT */
+    window.__edDeb = (i,c,v)=>{
         if (c === "valor") v = parseFloat(v.replace(",", ".")) || 0;
         debitos[i][c] = v;
         salvarMes();
-        atualizarTotais();
     };
+    window.__rmDeb = (i)=>{ debitos.splice(i,1); salvarMes(); renderDebitos(); };
 
-    window.__rmDeb = (i) => {
-        debitos.splice(i,1);
-        salvarMes();
-        renderDebitos();
-    };
-
-    window.__edRen = (i, c, v) => {
+    window.__edRen = (i,c,v)=>{
         if (c === "valor") v = parseFloat(v.replace(",", ".")) || 0;
         rendas[i][c] = v;
         salvarMes();
-        atualizarTotais();
     };
+    window.__rmRen = (i)=>{ rendas.splice(i,1); salvarMes(); renderRendas(); };
 
-    window.__rmRen = (i) => {
-        rendas.splice(i,1);
-        salvarMes();
-        renderRendas();
-    };
+    /* TOTAIS */
+    function formatBRL(v) {
+        return (Number(v) || 0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+    }
 
-    /* ---------------------------------------- */
-    /* + BOTÕES                                 */
-    /* ---------------------------------------- */
-    document.getElementById("addDebitoBtn").onclick = () => {
-        debitos.push({ nome: "Novo Débito", valor: 0 });
+    function atualizarTotais() {
+        const ts = debitos.reduce((s,d)=>s + Number(d.valor||0),0);
+        const tr = rendas.reduce((s,r)=>s + Number(r.valor||0),0);
+        const saldo = tr - ts;
+
+        document.getElementById("totalSaida").innerText = formatBRL(ts);
+        document.getElementById("totalRendas").innerText = formatBRL(tr);
+        document.getElementById("resumoSaida").innerText = formatBRL(ts);
+        document.getElementById("resumoRendas").innerText = formatBRL(tr);
+        document.getElementById("saldoFinal").innerText = formatBRL(saldo);
+
+        const el = document.getElementById("saldoFinal");
+        el.classList.toggle("text-danger", saldo < 0);
+        el.classList.toggle("text-success", saldo >= 0);
+    }
+
+    /* EVENTOS */
+    document.getElementById("addDebitoBtn").onclick = ()=>{
+        debitos.push({nome:"Novo Débito", valor:0});
         salvarMes();
         renderDebitos();
     };
 
-    document.getElementById("addRendaBtn").onclick = () => {
-        rendas.push({ nome: "Nova Renda", valor: 0 });
+    document.getElementById("addRendaBtn").onclick = ()=>{
+        rendas.push({nome:"Nova Renda", valor:0});
         salvarMes();
         renderRendas();
     };
 
-    newMonthBtn.onclick = criarNovoMes;
-    duplicateBtn.onclick = duplicarMes;
+    document.getElementById("newMonthBtn").onclick = criarNovoMes;
+    document.getElementById("duplicateBtn").onclick = duplicarMes;
 
-    logoutBtn.onclick = async () => {
+    document.getElementById("logoutBtn").onclick = async ()=>{
         await signOut(auth);
         window.location.href = "login.html";
     };
 
-    /* ---------------------------------------- */
-    /* AO FAZER LOGIN                            */
-    /* ---------------------------------------- */
+    monthSelect.onchange = async ()=>{
+        await salvarMes();
+        await carregarMes(monthSelect.value);
+    };
+
+    /* LOGIN OK → CARREGAR DADOS */
     onAuthStateChanged(auth, async user => {
         if (!user) return;
         usuarioId = user.uid;
 
-        // carrega lista
         await carregarListaMeses();
 
-        // se não houver meses, só deixa o select vazio
-        if (availableMonths.length > 0) {
-            currentMonthKey = availableMonths[availableMonths.length - 1];
-            await carregarMes(currentMonthKey);
+        if (availableMonths.length === 0) {
+            const hoje = new Date();
+            const y = hoje.getFullYear();
+            const m = String(hoje.getMonth()+1).padStart(2,"0");
+            currentMonthKey = `${y}-${m}`;
+            debitos = [];
+            rendas = [];
+            await salvarMes();
+            await carregarListaMeses();
         }
+
+        currentMonthKey = availableMonths[availableMonths.length - 1];
+        await carregarMes(currentMonthKey);
     });
 
 </script>
 
-/* ===========================
-PARTE 3 — Atualizações finais
-=========================== */
-
-/* ---------------------------------------- */
-/* UTILITÁRIOS                             */
-/* ---------------------------------------- */
-function formatBRL(value) {
-// valor numérico -> string "R$ 1.234,56"
-const n = Number(value) || 0;
-return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
-/* ---------------------------------------- */
-/* ATUALIZAR TOTAIS                         */
-/* ---------------------------------------- */
-function atualizarTotais() {
-const totalSaidaVal = debitos.reduce((acc, d) => acc + (Number(d.valor) || 0), 0);
-const totalRendasVal = rendas.reduce((acc, r) => acc + (Number(r.valor) || 0), 0);
-const saldoVal = totalRendasVal - totalSaidaVal;
-
-// atualiza UI
-document.getElementById("totalSaida").innerText = formatBRL(totalSaidaVal);
-document.getElementById("totalRendas").innerText = formatBRL(totalRendasVal);
-document.getElementById("resumoSaida").innerText = formatBRL(totalSaidaVal);
-document.getElementById("resumoRendas").innerText = formatBRL(totalRendasVal);
-document.getElementById("saldoFinal").innerText = formatBRL(saldoVal);
-document.getElementById("totalRendas").innerText = formatBRL(totalRendasVal);
-
-// destaca cor do saldo
-const saldoEl = document.getElementById("saldoFinal");
-if (saldoVal < 0) {
-saldoEl.classList.remove("text-success");
-saldoEl.classList.add("text-danger");
-} else {
-saldoEl.classList.remove("text-danger");
-saldoEl.classList.add("text-success");
-}
-}
-
-/* ---------------------------------------- */
-/* HANDLERS SELECT MÊS                      */
-/* ---------------------------------------- */
-monthSelect.onchange = async () => {
-const key = monthSelect.value;
-if (!key) return;
-// salva o mês atual antes de trocar (evita perda de dados se houver mudanças)
-await salvarMes();
-await carregarMes(key);
-};
-
-/* ---------------------------------------- */
-/* CRIAR MÊS ATUAL SE NÃO HOUVER NENHUM     */
-/* ---------------------------------------- */
-async function garantirMesPadrao() {
-if (availableMonths.length > 0) return;
-
-const hoje = new Date();
-const y = hoje.getFullYear();
-const m = String(hoje.getMonth() + 1).padStart(2, "0");
-const chave = `${y}-${m}`;
-
-// cria mês padrão vazio sem perguntar
-debitos = [];
-rendas = [];
-currentMonthKey = chave;
-await salvarMes();
-await carregarListaMeses();
-await carregarMes(chave);
-}
-
-/* ---------------------------------------- */
-/* MELHORIAS: ESCUTAR ALTERAÇÕES INLINE     */
-/* ---------------------------------------- */
-/* já usamos oninput nos elementos contenteditable apontando
-para window.__edDeb / __edRen — essas funções já chamam salvarMes() */
-
-/* ---------------------------------------- */
-/* AO FAZER LOGIN — melhorar fluxo inicial  */
-/* ---------------------------------------- */
-onAuthStateChanged(auth, async user => {
-if (!user) return;
-usuarioId = user.uid;
-
-// carrega lista
-await carregarListaMeses();
-
-// se não houver meses, cria um mês padrão (mês atual)
-if (availableMonths.length === 0) {
-await garantirMesPadrao();
-return;
-}
-
-// se já havia meses, seleciona o último (mais recente)
-if (!currentMonthKey) {
-currentMonthKey = availableMonths[availableMonths.length - 1];
-}
-
-// carrega o mês atual selecionado
-await carregarMes(currentMonthKey);
-});
-
-/* ---------------------------------------- */
-/* SALVAR PERIÓDICO (opcional)              */
-/* ---------------------------------------- */
-/* Se quiser, você pode salvar automaticamente periodicamente.
-Abaixo está apenas um exemplo comentado — ative se desejar:
-
-setInterval(() => {
-if (usuarioId && currentMonthKey) {
-salvarMes().catch(console.error);
-}
-}, 1000 * 30); // a cada 30s
-*/
-
-/* ---------------------------------------- */
-/* FIM — garantir render inicial correto    */
-/* ---------------------------------------- */
-// caso a página já tenha sido carregada e o usuário esteja logado,
-// onAuthStateChanged será chamado; se quiser forçar alguma coisa
-// ao final do script, pode descomentar o trecho abaixo:
-// atualizarTotais();
-
-/* ------------------------------
-EOF — Parte 3
------------------------------- */
+</body>
+</html>
