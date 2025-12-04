@@ -67,11 +67,16 @@ document.getElementById("btnCriarConta")?.addEventListener("click", () => {
    RECUPERAR SENHA (esqueci senha)
 --------------------------------*/
 document.getElementById("forgotPassword")?.addEventListener("click", async () => {
-    const email = prompt("Digite o e-mail cadastrado:");
-    if (!email) return;
+    const email = document.getElementById("email").value.trim();
+
+    if (!email) {
+        alert("Digite o e-mail no campo antes de clicar em recuperar senha.");
+        return;
+    }
+
     try {
         await sendPasswordResetEmail(auth, email);
-        alert("Enviamos um link de redefinição para o seu e-mail!");
+        alert("Um link para redefinição de senha foi enviado para o seu e-mail.");
     } catch (err) {
         console.error("Erro ao enviar reset:", err);
         alert("Erro ao enviar e-mail: " + err.message);
