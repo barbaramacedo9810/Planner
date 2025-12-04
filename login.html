@@ -7,6 +7,9 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- ADICIONAR (necessário para os ícones bi bi-...) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
     <style>
         body{
             margin: 0;
@@ -17,10 +20,9 @@
         .main-container{
             display: flex;
             height: 100vh;
-            padding-top: 56px; /* espaço da navbar */
+            padding-top: 56px;
         }
 
-        /* LADO DA IMAGEM */
         .image-side{
             flex: 1;
             background-image: url("img/login.png");
@@ -29,16 +31,14 @@
             background-position: left 0px top 0px;
         }
 
-        /* LADO DO LOGIN */
         .login-side{
-            width: 1100px; /* largura fixa do card */
+            width: 1100px;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
 
-        /* Card */
         .login-container{
             width: 100%;
             max-width: 450px;
@@ -82,7 +82,17 @@
             background:#35a3ce;
         }
 
-        /* RESPONSIVO CELULAR */
+        .btn-criar{
+            width:100%;
+            padding:10px;
+            margin-top:10px;
+            background:none;
+            border:none;
+            font-size:14px;
+            color:#4dbce9;
+            text-decoration:underline;
+        }
+
         @media (max-width: 900px){
             .main-container{
                 flex-direction:column;
@@ -105,10 +115,10 @@
 </head>
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm">
+<nav class="navbar navbar-expand-lg fixed-top shadow-sm" style="background-color: #FFF5E6;">
     <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center" href="index.html">
+
+        <a class="navbar-brand d-flex align-items-center" href="#">
             <i class="bi bi-journal-check" style="font-size:22px; margin-right:6px;"></i>
             Planejamento
         </a>
@@ -118,15 +128,53 @@
         </button>
 
         <div class="collapse navbar-collapse" id="menu">
-            <ul class="navbar-nav ms-auto" id="menuLogado" style="display:none;">
-                <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house-door"></i> Início</a></li>
+
+            <ul class="navbar-nav ms-auto" id="menuLogado" style="display: none;">
+                <li class="nav-item">
+                    <a class="nav-link" href="calendario.html">
+                        <i class="bi bi-house-door"></i> Início
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="planejamento.html">
+                        <i class="bi bi-journal-check"></i> Planejamento
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="praia.html">
+                        <i class="bi bi-sun"></i> Praia
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="atrasadas.html">
+                        <i class="bi bi-exclamation-triangle"></i> Atrasadas
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="calendario.html">
+                        <i class="bi bi-calendar3"></i> Calendário
+                    </a>
+                </li>
+
+                <li class="nav-item ms-3">
+                    <button id="logoutBtn" class="btn btn-danger btn-sm">Sair</button>
+                </li>
             </ul>
-            <ul class="navbar-nav ms-auto" id="menuDeslogado" style="display:none;">
-                <li class="nav-item"><a class="nav-link btn btn-primary text-white px-3" href="login.html">Entrar</a></li>
+
+            <ul class="navbar-nav ms-auto" id="menuDeslogado">
+                <li class="nav-item">
+                    <a class="nav-link btn btn-primary text-white px-3" href="login.html">Entrar</a>
+                </li>
             </ul>
+
         </div>
     </div>
 </nav>
+
 
 <div class="main-container">
 
@@ -137,24 +185,35 @@
             <div class="title">Bem-vinda! ✨</div>
             <div class="subtitle">Acesse seu planner financeiro 💙</div>
 
-            <form>
+            <form id="loginForm">
+
                 <div class="mb-3">
                     <label class="form-label">E-mail</label>
-                    <input class="form-control" type="email">
+                    <input class="form-control" type="email" id="email">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Senha</label>
-                    <input class="form-control" type="password">
+                    <input class="form-control" type="password" id="senha">
                 </div>
 
-                <button class="btn-entrar">Entrar</button>
+                <p id="errorMsg" class="text-danger text-center mt-2"></p>
+
+                <button class="btn-entrar" type="submit">Entrar</button>
+
+                <button id="forgotPassword" class="btn-criar" type="button">
+                    Esqueci minha senha
+                </button>
+
+                <button id="btnCriarConta" class="btn-criar" type="button">
+                    Criar uma nova conta
+                </button>
+
             </form>
         </div>
     </div>
 </div>
 
-<!-- se usar firebase/auth, mantenha o import; caso contrário remova -->
 <script type="module" src="auth.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

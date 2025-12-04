@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Recuperar Senha</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #FFF5E6;
+            font-family: "Poppins", sans-serif;
+        }
+        .card-box {
+            max-width: 430px;
+            margin: 140px auto;
+            padding: 24px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 8px 26px rgba(0,0,0,0.12);
+        }
+    </style>
+</head>
+<body>
+
+<div class="card-box">
+    <h3>Recuperar Senha</h3>
+    <p class="text-muted">Digite seu e-mail para receber o link de redefinição.</p>
+
+    <input class="form-control" id="emailRec" placeholder="Seu e-mail"><br>
+
+    <p id="msgRec" class="text-center"></p>
+
+    <button id="btnRec" class="btn btn-primary w-100">Enviar link</button>
+
+    <button onclick="window.location.href='login.html'" class="btn btn-link w-100 mt-3">
+        Voltar
+    </button>
+</div>
+
+<script type="module" src="recuperarsenha.js"></script>
+</body>
+</html>
