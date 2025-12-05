@@ -4,12 +4,12 @@ import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/fire
 const auth = getAuth(app);
 
 /**
- * Faz logout e redireciona para login.html
+ * Faz logout e redireciona para index.html
  */
 export function fazerLogout() {
     signOut(auth)
         .then(() => {
-            window.location.href = "login.html";
+            window.location.href = "index.html";
         })
         .catch(err => {
             console.error("Erro ao fazer logout:", err);

@@ -1,4 +1,8 @@
+/* ======================================================
+   IMPORTA FIREBASE (APP + FIRESTORE)
+====================================================== */
 import app, { db } from "./firebase.js";
+
 import {
     getAuth,
     signInWithEmailAndPassword,
@@ -9,125 +13,101 @@ import {
     onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+    doc,
+    setDoc,
+    getDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 
 /* ======================================================
-   IGNORAR EXECUÇÃO EM PÁGINAS SEM NAVBAR (ex: recuperarsenha.html)
-   NÃO usar `return` no top-level (causa SyntaxError)
+   INICIALIZA AUTENTICAÇÃO
 ====================================================== */
-const paginasIgnoradas = ["recuperarsenha.html"];
-const paginaAtual = window.location.pathname.split("/").pop();
-const executarAuth = !paginasIgnoradas.includes(paginaAtual);
+export const auth = getAuth(app); // ESSENCIAL - NÃO REMOVER
 
-if (!executarAuth) {
-    console.log("auth.js não será executado nesta página:", paginaAtual);
-} else {
 
-    /* ======================================================
-       AUTENTICAÇÃO
-    ====================================================== */
-    export const auth = getAuth(app);
+/* ======================================================
+   FUNÇÃO PARA CRIAR USUÁRIO
+====================================================== */
+export async function criarUsuario(email, senha, nome) {
+    try {
+        const cred = await createUserWithEmailAndPassword(auth, email, senha);
 
-    // Elementos opcionais do layout
-    const menuLogado = document.getElementById("menuLogado");
-    const menuDeslogado = document.getElementById("menuDeslogado");
-    const logoutBtn = document.getElementById("logoutBtn");
+        // salva dados do usuário
+        await setDoc(doc(db, "usuarios", cred.user.uid), {
+            nome: nome,
+            email: email,
+            criadoEm: new Date()
+        });
 
-    /* ======================================================
-       CONTROLE DE SESSÃO
-    ====================================================== */
+        return { ok: true, user: cred.user };
+
+    } catch (erro) {
+        return { ok: false, erro };
+    }
+}
+
+
+/* ======================================================
+   FUNÇÃO PARA LOGIN
+====================================================== */
+export async function fazerLogin(email, senha) {
+    try {
+        const cred = await signInWithEmailAndPassword(auth, email, senha);
+        return { ok: true, user: cred.user };
+    } catch (erro) {
+        return { ok: false, erro };
+    }
+}
+
+
+/* ======================================================
+   FUNÇÃO PARA RESET DE SENHA
+====================================================== */
+export async function resetSenha(email) {
+    try {
+        await sendPasswordResetEmail(auth, email);
+        return { ok: true };
+    } catch (erro) {
+        return { ok: false, erro };
+    }
+}
+
+
+/* ======================================================
+   FUNÇÃO PARA LOGOUT
+====================================================== */
+export async function fazerLogout() {
+    try {
+        await signOut(auth);
+        return { ok: true };
+    } catch (erro) {
+        return { ok: false, erro };
+    }
+}
+
+
+/* ======================================================
+   MONITORAMENTO DE LOGIN AUTOMÁTICO
+====================================================== */
+export function observarUsuario(callback) {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            if (menuLogado) menuLogado.style.display = "flex";
-            if (menuDeslogado) menuDeslogado.style.display = "none";
+            // pega dados do Firestore
+            const snap = await getDoc(doc(db, "usuarios", user.uid));
+            const dados = snap.exists() ? snap.data() : null;
 
-            // Usuário já logado → impedir acesso ao login
-            if (paginaAtual === "login.html") {
-                window.location.href = "calendario.html";
-            }
+            callback({
+                logado: true,
+                user: user,
+                dados: dados
+            });
         } else {
-            if (menuLogado) menuLogado.style.display = "none";
-            if (menuDeslogado) menuDeslogado.style.display = "flex";
+            callback({
+                logado: false,
+                user: null,
+                dados: null
+            });
         }
     });
-
-    /* ======================================================
-       LOGIN
-    ====================================================== */
-    document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const email = document.getElementById("email").value.trim();
-        const senha = document.getElementById("senha").value.trim();
-        const errorMsg = document.getElementById("errorMsg");
-
-        if (errorMsg) errorMsg.textContent = "";
-
-        try {
-            await signInWithEmailAndPassword(auth, email, senha);
-            window.location.href = "calendario.html";
-        } catch (error) {
-            console.error("Erro login:", error);
-            if (errorMsg) errorMsg.textContent = "E-mail ou senha incorretos!";
-        }
-    });
-
-    /* ======================================================
-       BOTÃO CRIAR CONTA
-    ====================================================== */
-    document.getElementById("btnCriarConta")?.addEventListener("click", () => {
-        window.location.href = "criarconta.html";
-    });
-
-    /* ======================================================
-       RECUPERAR SENHA (na tela de login)
-    ====================================================== */
-    document.getElementById("forgotPassword")?.addEventListener("click", async () => {
-        const email = document.getElementById("email").value.trim();
-
-        if (!email) {
-            alert("Digite o e-mail no campo antes de recuperar a senha.");
-            return;
-        }
-
-        try {
-            await sendPasswordResetEmail(auth, email);
-            alert("Enviamos um link para redefinir sua senha. Verifique seu e-mail.");
-        } catch (err) {
-            console.error("Erro ao enviar reset:", err);
-
-            if (err.code === "auth/user-not-found") {
-                alert("Este e-mail não está cadastrado.");
-            } else if (err.code === "auth/invalid-email") {
-                alert("E-mail inválido.");
-            } else {
-                alert("Erro: " + err.message);
-            }
-        }
-    });
-
-    /* ======================================================
-       LOGOUT
-    ====================================================== */
-    logoutBtn?.addEventListener("click", async () => {
-        try {
-            await signOut(auth);
-            window.location.href = "login.html";
-        } catch (err) {
-            console.error("Erro ao sair:", err);
-            alert("Erro ao sair: " + err.message);
-        }
-    });
-
-    /* ======================================================
-       EXPORTA FUNÇÕES (se necessário)
-    ====================================================== */
-    export {
-        signInWithEmailAndPassword,
-        createUserWithEmailAndPassword,
-        sendPasswordResetEmail,
-        signOut,
-        updatePassword,
-        onAuthStateChanged
-    };
-} // fim do else executarAuth
+}

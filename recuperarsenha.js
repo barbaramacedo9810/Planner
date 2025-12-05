@@ -109,7 +109,7 @@ btnNovaSenha?.addEventListener("click", async () => {
         msgNova.textContent = "Senha alterada com sucesso!";
 
         setTimeout(() => {
-            window.location.href = "login.html";
+            window.location.href = "index.html";
         }, 1500);
 
     } catch (err) {
