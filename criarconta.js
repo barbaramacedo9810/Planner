@@ -1,16 +1,14 @@
-import app from "./firebase.js";
+import { auth } from "./auth.js"; // usa a mesma instância do auth
+import { db } from "./firebase.js";
+
 import {
-    getAuth,
-    createUserWithEmailAndPassword,
+    createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
 import {
-    getFirestore,
     doc,
     setDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const auth = getAuth(app);
-const db = getFirestore(app);
 
 /* =================================================
    FUNÇÃO PARA VALIDAR FORÇA DA SENHA
@@ -23,11 +21,16 @@ function validarSenha(senha) {
         simbolo: /[!@#$%^&*(),.?":{}|<>]/.test(senha)
     };
 
-    return regras.minimo && regras.letra && regras.numero && regras.simbolo;
+    return (
+        regras.minimo &&
+        regras.letra &&
+        regras.numero &&
+        regras.simbolo
+    );
 }
 
 /* =================================================
-   CRIAÇÃO DE NOVO USUÁRIO
+   FORM DE CRIAÇÃO DE CONTA
 =================================================== */
 const form = document.getElementById("registerForm");
 
@@ -48,7 +51,7 @@ if (form) {
             return;
         }
 
-        // Senhas iguais?
+        // Senhas iguais
         if (senha !== senha2) {
             errorMsg.textContent = "As senhas não coincidem!";
             return;
@@ -57,7 +60,7 @@ if (form) {
         // Senha forte
         if (!validarSenha(senha)) {
             errorMsg.textContent =
-                "A senha deve ter no mínimo 6 caracteres e incluir letra, número e símbolo.";
+                "A senha deve ter no mínimo 6 caracteres, incluindo letra, número e símbolo.";
             return;
         }
 
@@ -79,7 +82,7 @@ if (form) {
                 }
             });
 
-            // 👍 Redireciona após criar conta
+            // 👉 Redireciona após criação
             window.location.href = "calendario.html";
 
         } catch (error) {

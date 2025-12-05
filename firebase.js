@@ -5,7 +5,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyA_Al0b-GSkj2rB98hY9LogbxVTbZIPQPU",
     authDomain: "planner-3127a.firebaseapp.com",
     projectId: "planner-3127a",
-    storageBucket: "planner-3127a.firebasestorage.app",
+    storageBucket: "planner-3127a.appspot.com",   // ✔️ correto
     messagingSenderId: "236636645828",
     appId: "1:236636645828:web:0c4445bb4e43ed2cb01c91",
     measurementId: "G-F733M6GBZZ"

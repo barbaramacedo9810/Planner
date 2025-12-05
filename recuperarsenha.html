@@ -1,42 +1,105 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recuperar Senha</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
         body {
-            background: #FFF5E6;
-            font-family: "Poppins", sans-serif;
+            background: #faeddc;
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
         }
-        .card-box {
-            max-width: 430px;
-            margin: 140px auto;
-            padding: 24px;
+
+        .box {
             background: white;
-            border-radius: 14px;
-            box-shadow: 0 8px 26px rgba(0,0,0,0.12);
+            padding: 30px;
+            border-radius: 12px;
+            width: 350px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 12px;
+            border-radius: 8px;
+            border: none;
+            background: #3b82f6;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background: #2563eb;
+        }
+
+        #msg, #msg2 {
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .voltar {
+            margin-top: 15px;
+            display: inline-block;
+            text-decoration: none;
+            font-size: 0.9rem;
+            color: #3b82f6;
+        }
+
+        .voltar:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
-<div class="card-box">
-    <h3>Recuperar Senha</h3>
-    <p class="text-muted">Digite seu e-mail para receber o link de redefinição.</p>
+<div class="box">
 
-    <input class="form-control" id="emailRec" placeholder="Seu e-mail"><br>
+    <!-- FORM 1: enviar email -->
+    <div id="form-email">
+        <h2>Recuperar senha</h2>
+        <p>Digite o e-mail para enviarmos o link de redefinição:</p>
 
-    <p id="msgRec" class="text-center"></p>
+        <input type="email" id="emailRec" placeholder="Seu e-mail">
+        <button id="btnRec">Enviar link de recuperação</button>
 
-    <button id="btnRec" class="btn btn-primary w-100">Enviar link</button>
+        <p id="msg"></p>
 
-    <button onclick="window.location.href='login.html'" class="btn btn-link w-100 mt-3">
-        Voltar
-    </button>
+        <a class="voltar" href="login.html">Voltar para o login</a>
+    </div>
+
+    <!-- FORM 2: definir nova senha -->
+    <div id="form-nova-senha" style="display: none;">
+        <h2>Definir nova senha</h2>
+
+        <input type="password" id="novaSenha" placeholder="Nova senha">
+        <button id="btnNovaSenha">Salvar nova senha</button>
+
+        <p id="msg2"></p>
+
+        <a class="voltar" href="login.html">Voltar para o login</a>
+    </div>
+
 </div>
 
 <script type="module" src="recuperarsenha.js"></script>

@@ -1,4 +1,3 @@
-// auth.js
 import app, { db } from "./firebase.js";
 import {
     getAuth,
@@ -12,89 +11,112 @@ import {
 
 import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const auth = getAuth(app);
+// 🔥 AUTENTICAÇÃO
+export const auth = getAuth(app);
 
-// Helper: mostra/oculta menus
+// Elementos opcionais do layout
 const menuLogado = document.getElementById("menuLogado");
 const menuDeslogado = document.getElementById("menuDeslogado");
 const logoutBtn = document.getElementById("logoutBtn");
 
-// Atualiza menus conforme autenticação
+/* ======================================================
+   CONTROLE DE SESSÃO
+====================================================== */
 onAuthStateChanged(auth, async (user) => {
     if (user) {
+        // Usuário logado
         if (menuLogado) menuLogado.style.display = "flex";
         if (menuDeslogado) menuDeslogado.style.display = "none";
 
-        // Se estiver em login.html redireciona para calendário
+        // Evita redirecionamento automático a cada refresh
         if (window.location.pathname.includes("login.html")) {
             window.location.href = "calendario.html";
         }
     } else {
+        // Usuário deslogado
         if (menuLogado) menuLogado.style.display = "none";
         if (menuDeslogado) menuDeslogado.style.display = "flex";
     }
 });
 
-/* ------------------------------
+/* ======================================================
    LOGIN
---------------------------------*/
+====================================================== */
 document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
     e.preventDefault();
+
     const email = document.getElementById("email").value.trim();
     const senha = document.getElementById("senha").value.trim();
     const errorMsg = document.getElementById("errorMsg");
 
+    if (errorMsg) errorMsg.textContent = "";
+
     try {
         await signInWithEmailAndPassword(auth, email, senha);
-        // Redireciona para calendário
         window.location.href = "calendario.html";
     } catch (error) {
         console.error("Erro login:", error);
-        if (errorMsg) errorMsg.textContent = "E-mail ou senha incorretos!";
+        if (errorMsg)
+            errorMsg.textContent = "E-mail ou senha incorretos!";
     }
 });
 
-/* ------------------------------
-   CRIAR NOVO USUÁRIO
-   (se você usar criarconta.html com registerForm, prefira criarconta.js)
---------------------------------*/
+/* ======================================================
+   BOTÃO CRIAR CONTA
+====================================================== */
 document.getElementById("btnCriarConta")?.addEventListener("click", () => {
-    // abre a página de criar conta
     window.location.href = "criarconta.html";
 });
 
-/* ------------------------------
-   RECUPERAR SENHA (esqueci senha)
---------------------------------*/
+/* ======================================================
+   RECUPERAR SENHA
+====================================================== */
 document.getElementById("forgotPassword")?.addEventListener("click", async () => {
+
     const email = document.getElementById("email").value.trim();
 
     if (!email) {
-        alert("Digite o e-mail no campo antes de clicar em recuperar senha.");
+        alert("Digite o e-mail no campo antes de recuperar a senha.");
         return;
     }
 
     try {
         await sendPasswordResetEmail(auth, email);
-        alert("Um link para redefinição de senha foi enviado para o seu e-mail.");
+        alert("Enviamos um link para redefinir sua senha. Verifique sua caixa de entrada.");
     } catch (err) {
         console.error("Erro ao enviar reset:", err);
-        alert("Erro ao enviar e-mail: " + err.message);
+
+        if (err.code === "auth/user-not-found") {
+            alert("Este e-mail não está cadastrado.");
+        } else if (err.code === "auth/invalid-email") {
+            alert("E-mail inválido.");
+        } else {
+            alert("Erro: " + err.message);
+        }
     }
 });
 
-/* ------------------------------
-   LOGOUT INTELIGENTE
---------------------------------*/
-if (logoutBtn) {
-    logoutBtn.addEventListener("click", async () => {
-        try {
-            await signOut(auth);
-            // volta para a página de login
-            window.location.href = "login.html";
-        } catch (err) {
-            console.error("Erro ao sair:", err);
-            alert("Erro ao sair: " + err.message);
-        }
-    });
-}
+/* ======================================================
+   LOGOUT
+====================================================== */
+logoutBtn?.addEventListener("click", async () => {
+    try {
+        await signOut(auth);
+        window.location.href = "login.html";
+    } catch (err) {
+        console.error("Erro ao sair:", err);
+        alert("Erro ao sair: " + err.message);
+    }
+});
+
+/* ======================================================
+   EXPORTA FUNÇÕES SE NECESSÁRIO
+====================================================== */
+export {
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    sendPasswordResetEmail,
+    signOut,
+    updatePassword,
+    onAuthStateChanged
+};
