@@ -11,7 +11,21 @@ import {
 
 import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// 🔥 AUTENTICAÇÃO
+/* ======================================================
+   IGNORAR EXECUÇÃO EM PÁGINAS SEM NAVBAR
+   (como recuperarsenha.html)
+====================================================== */
+const paginasIgnoradas = ["recuperarsenha.html"];
+const paginaAtual = window.location.pathname.split("/").pop();
+
+if (paginasIgnoradas.includes(paginaAtual)) {
+    console.log("auth.js ignorado nesta página:", paginaAtual);
+    return; // Para execução aqui
+}
+
+/* ======================================================
+   AUTENTICAÇÃO
+====================================================== */
 export const auth = getAuth(app);
 
 // Elementos opcionais do layout
@@ -24,16 +38,14 @@ const logoutBtn = document.getElementById("logoutBtn");
 ====================================================== */
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        // Usuário logado
         if (menuLogado) menuLogado.style.display = "flex";
         if (menuDeslogado) menuDeslogado.style.display = "none";
 
-        // Evita redirecionamento automático a cada refresh
-        if (window.location.pathname.includes("login.html")) {
+        // Usuário já logado → impedir acesso ao login
+        if (paginaAtual === "login.html") {
             window.location.href = "calendario.html";
         }
     } else {
-        // Usuário deslogado
         if (menuLogado) menuLogado.style.display = "none";
         if (menuDeslogado) menuDeslogado.style.display = "flex";
     }
@@ -56,8 +68,7 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
         window.location.href = "calendario.html";
     } catch (error) {
         console.error("Erro login:", error);
-        if (errorMsg)
-            errorMsg.textContent = "E-mail ou senha incorretos!";
+        if (errorMsg) errorMsg.textContent = "E-mail ou senha incorretos!";
     }
 });
 
@@ -69,10 +80,9 @@ document.getElementById("btnCriarConta")?.addEventListener("click", () => {
 });
 
 /* ======================================================
-   RECUPERAR SENHA
+   RECUPERAR SENHA (na tela de login)
 ====================================================== */
 document.getElementById("forgotPassword")?.addEventListener("click", async () => {
-
     const email = document.getElementById("email").value.trim();
 
     if (!email) {
@@ -82,7 +92,7 @@ document.getElementById("forgotPassword")?.addEventListener("click", async () =>
 
     try {
         await sendPasswordResetEmail(auth, email);
-        alert("Enviamos um link para redefinir sua senha. Verifique sua caixa de entrada.");
+        alert("Enviamos um link para redefinir sua senha. Verifique seu e-mail.");
     } catch (err) {
         console.error("Erro ao enviar reset:", err);
 
@@ -110,7 +120,7 @@ logoutBtn?.addEventListener("click", async () => {
 });
 
 /* ======================================================
-   EXPORTA FUNÇÕES SE NECESSÁRIO
+   EXPORTAÇÃO (opcional)
 ====================================================== */
 export {
     signInWithEmailAndPassword,
