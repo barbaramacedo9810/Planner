@@ -10,72 +10,56 @@
     <!-- Ícones Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- Material Icons (opção E escolhida) -->
+    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <!-- Seu CSS externo -->
     <link rel="stylesheet" href="css/style.css">
 
     <style>
-        /* Pequenos ajustes locais para inputs na tabela (mantém layout atual) */
-        .table td input[type="number"]{
-            width: 110px;
-        }
+        .table td input[type="number"]{ width: 110px; }
         .table td input[type="text"]{
-            width: 100%;
-            min-width: 120px;
-            border: none;
-            background: transparent;
-            padding: 0;
+            width: 100%; min-width: 120px; border: none; background: transparent; padding: 0;
         }
         .table td input[type="text"]:focus,
-        .table td input[type="number"]:focus {
-            outline: none;
-            box-shadow: none;
-        }
-        .checkbox-center {
-            display:flex;
-            justify-content:center;
-            align-items:center;
-        }
+        .table td input[type="number"]:focus { outline: none; box-shadow: none; }
 
-        /* Evita que imagens decorativas capturem cliques */
-        .resumo-img,
-        .menininha-img {
-            pointer-events: none;
-        }
+        .checkbox-center { display:flex; justify-content:center; align-items:center; }
 
-        /* coluna do ícone check minimalista */
+        .resumo-img, .menininha-img { pointer-events: none; }
+
         .col-check-icon {
-            font-size: 20px;
-            text-align: center;
-            color: #1aab2a;
+            font-size: 20px; text-align: center; color: #1aab2a;
         }
 
-        /* melhora aparencia do input dentro da celula */
         .table td .form-control-sm {
             padding: .25rem .5rem;
             height: calc(1.5em + .5rem);
         }
 
-        /* responsividade - garante overflow da tabela */
-        .table-responsive {
-            overflow-x: auto;
-        }
+        .table-responsive { overflow-x: auto; }
     </style>
 </head>
 <body>
 
-<!-- Proteção de login -->
+<!-- Proteção de login (versão CORRETA que evita ver a página sem login) -->
 <script type="module">
     import app from "./firebase.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const auth = getAuth(app);
+
+    // Esconde a página até validar login
+    document.body.style.display = "none";
+
     onAuthStateChanged(auth, (user) => {
         if (!user) {
             window.location.href = "login.html";
+            return;
         }
+
+        // Usuário logado → libera página
+        document.body.style.display = "block";
     });
 </script>
 
@@ -270,8 +254,6 @@
     const totalSaidaFooter = document.getElementById("totalSaida");
     const totalRendasEl = document.getElementById("totalRendas");
 
-    /* FIRESTORE PATH HELPERS (correto: coleção 'planejamento' sob o documento do usuário) */
-    // collection(db, "usuarios", uid, "planejamento") => segmentos: usuarios (col) / uid (doc) / planejamento (col) -> OK
     const colMeses = (uid) => collection(db, "usuarios", uid, "planejamento");
     const docMes = (uid, key) => doc(db, "usuarios", uid, "planejamento", key);
 
@@ -287,7 +269,6 @@
             atualizarSelect();
         } catch (err) {
             console.error("Erro ao listar meses:", err);
-            // mostrar no console do usuário (útil para debugging)
         }
     }
 
@@ -321,7 +302,7 @@
     }
 
     /* -------------------------
-       CARREGA MÊS (sem sobrescrever wrapper visual)
+       CARREGA MÊS
     ------------------------- */
     async function carregarMes(key) {
         try {
@@ -339,15 +320,14 @@
             if (snap.exists()) {
                 const data = snap.data();
                 debitos = Array.isArray(data.debitos) ? data.debitos : [];
-                // normaliza estrutura de cada débito
-                debitos = debitos.map(d => {
-                    return {
-                        nome: d && typeof d.nome !== "undefined" ? d.nome : "",
-                        valor: Number(d && d.valor ? d.valor : 0),
-                        falta: typeof d?.falta !== "undefined" ? Number(d.falta) : Number(d && d.valor ? d.valor : 0),
-                        pago: Boolean(d && d.pago) || (Number(d?.falta ?? d?.valor ?? 0) === 0)
-                    };
-                });
+
+                debitos = debitos.map(d => ({
+                    nome: d?.nome || "",
+                    valor: Number(d?.valor || 0),
+                    falta: typeof d?.falta !== "undefined" ? Number(d.falta) : Number(d.valor || 0),
+                    pago: Boolean(d?.pago) || Number(d?.falta ?? 0) === 0
+                }));
+
                 rendas = Array.isArray(data.rendas) ? data.rendas : [];
             } else {
                 debitos = [];
@@ -375,7 +355,6 @@
                 rendas,
                 updatedAt: new Date().toISOString()
             });
-            // atualiza lista sem sobrescrever seleção atual
             await carregarListaMeses();
         } catch (err) {
             console.error("Erro ao salvar mês:", err);
@@ -383,7 +362,7 @@
     }
 
     /* -------------------------
-       CRIAR NOVO MÊS (prompt), valida e salva
+       NOVO MÊS
     ------------------------- */
     async function criarNovoMes() {
         const mes = prompt("Informe o mês (YYYY-MM):");
@@ -411,10 +390,12 @@
         if (!/^\d{4}-\d{2}$/.test(destino)) { alert("Formato inválido."); return; }
 
         const origem = prevMonthKey(destino);
+
         try {
             const snap = await getDoc(docMes(usuarioId, origem));
             if (!snap.exists()) { alert("Mês anterior não existe."); return; }
             const data = snap.data();
+
             debitos = JSON.parse(JSON.stringify(data.debitos || []));
             rendas = JSON.parse(JSON.stringify(data.rendas || []));
             currentMonthKey = destino;
@@ -429,46 +410,50 @@
     }
 
     /* -------------------------
-       RENDERIZAÇÃO DÉBITOS (tabela)
+       RENDERIZAÇÃO DÉBITOS
     ------------------------- */
     function renderDebitos() {
         tabelaBody.innerHTML = "";
+
         debitos.forEach((d, i) => {
-            // garantia de campos
             d.nome = d.nome || "";
             d.valor = Number(d.valor || 0);
-            d.falta = typeof d.falta !== "undefined" ? Number(d.falta) : d.valor;
+            d.falta = Number(d.falta ?? d.valor);
             d.pago = Boolean(d.pago);
 
             const tr = document.createElement("tr");
-
-            // note: escapeHtml para evitar injeção em value
             tr.innerHTML = `
                 <td>
-                    <input type="text" class="form-control form-control-sm" value="${escapeHtml(String(d.nome))}"
-                           oninput="window.__edDeb(${i}, 'nome', this.value)">
+                    <input type="text" class="form-control form-control-sm"
+                        value="${escapeHtml(d.nome)}"
+                        oninput="window.__edDeb(${i}, 'nome', this.value)">
                 </td>
 
                 <td class="align-middle">
-                    <input type="number" class="form-control form-control-sm" step="0.01" min="0" value="${(Number(d.valor)||0).toFixed(2)}"
+                    <input type="number" class="form-control form-control-sm" step="0.01" min="0"
+                        value="${d.valor.toFixed(2)}"
                         onchange="window.__edDeb(${i}, 'valor', this.value)">
                 </td>
 
                 <td class="align-middle">
-                    <input type="number" class="form-control form-control-sm" step="0.01" min="0" value="${(Number(d.falta)||0).toFixed(2)}"
+                    <input type="number" class="form-control form-control-sm" step="0.01" min="0"
+                        value="${d.falta.toFixed(2)}"
                         onchange="window.__edDeb(${i}, 'falta', this.value)">
                 </td>
 
                 <td class="checkbox-center align-middle">
-                    <input type="checkbox" ${d.pago ? "checked" : ""} onchange="window.__togglePago(${i}, this.checked)">
+                    <input type="checkbox" ${d.pago ? "checked" : ""}
+                        onchange="window.__togglePago(${i}, this.checked)">
                 </td>
 
                 <td class="col-check-icon align-middle">
-                    ${d.pago ? '<span class="material-icons" aria-hidden="true" title="Pago">done</span>' : ''}
+                    ${d.pago ? '<span class="material-icons">done</span>' : ''}
                 </td>
 
                 <td class="text-center align-middle">
-                    <button class="btn btn-danger btn-sm" onclick="window.__rmDeb(${i})"><i class="bi bi-trash"></i></button>
+                    <button class="btn btn-danger btn-sm" onclick="window.__rmDeb(${i})">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </td>
             `;
             tabelaBody.appendChild(tr);
@@ -478,20 +463,33 @@
     }
 
     /* -------------------------
-       RENDER RENDAS (mantido)
+       RENDER RENDAS
     ------------------------- */
     function renderRendas() {
         rendasLista.innerHTML = "";
         rendas.forEach((r, i) => {
             const div = document.createElement("div");
             div.className = "d-flex justify-content-between align-items-center mb-2";
-            const nome = (r && r.nome) ? r.nome : "";
-            const valor = Number(r && r.valor ? r.valor : 0).toFixed(2);
+
+            const nome = r?.nome || "";
+            const valor = Number(r?.valor || 0).toFixed(2);
+
             div.innerHTML = `
-                <div contenteditable="true" oninput="window.__edRen(${i}, 'nome', this.innerText)">${escapeHtml(nome)}</div>
+                <div contenteditable="true"
+                     oninput="window.__edRen(${i}, 'nome', this.innerText)">
+                    ${escapeHtml(nome)}
+                </div>
+
                 <div>
-                    <span contenteditable="true" oninput="window.__edRen(${i}, 'valor', this.innerText)">${valor}</span>
-                    <button class="btn btn-danger btn-sm ms-2" onclick="window.__rmRen(${i})"><i class="bi bi-trash"></i></button>
+                    <span contenteditable="true"
+                          oninput="window.__edRen(${i}, 'valor', this.innerText)">
+                        ${valor}
+                    </span>
+
+                    <button class="btn btn-danger btn-sm ms-2"
+                            onclick="window.__rmRen(${i})">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </div>
             `;
             rendasLista.appendChild(div);
@@ -500,7 +498,7 @@
     }
 
     /* -------------------------
-       ESCAPE
+       ESCAPE HTML
     ------------------------- */
     function escapeHtml(str) {
         return String(str)
@@ -511,37 +509,31 @@
     }
 
     /* -------------------------
-       OPERACOES INLINE DÉBITOS
+       OPERAÇÕES INLINE - DÉBITOS
     ------------------------- */
     window.__edDeb = (i, campo, v) => {
         if (!debitos[i]) return;
+
         if (campo === "valor" || campo === "falta") {
             const num = parseFloat(String(v).replace(",", ".")) || 0;
             debitos[i][campo] = num;
 
-            // regras:
-            // - se falta === 0 => pago true
-            // - se falta > 0 => pago false
             if (campo === "falta") {
-                debitos[i].pago = Number(num) === 0;
+                debitos[i].pago = num === 0;
             }
 
-            // não permitir falta > valor
             if (debitos[i].falta > debitos[i].valor) {
                 debitos[i].falta = debitos[i].valor;
             }
 
-            // se alterou valor e falta era maior que novo valor, ajustar falta
             if (campo === "valor" && debitos[i].falta > debitos[i].valor) {
                 debitos[i].falta = debitos[i].valor;
-                if (debitos[i].falta === 0) debitos[i].pago = true;
             }
 
         } else {
             debitos[i][campo] = v;
         }
 
-        // re-render e salva
         renderDebitos();
         salvarMes();
     };
@@ -549,12 +541,13 @@
     window.__togglePago = (i, checked) => {
         if (!debitos[i]) return;
         debitos[i].pago = Boolean(checked);
-        if (debitos[i].pago) {
+
+        if (checked) {
             debitos[i].falta = 0;
         } else {
-            // se desmarcou, assume que falta é o valor total
             debitos[i].falta = Number(debitos[i].valor || 0);
         }
+
         renderDebitos();
         salvarMes();
     };
@@ -566,12 +559,15 @@
     };
 
     /* -------------------------
-       RENDAS INLINE
+       OPERAÇÕES INLINE - RENDAS
     ------------------------- */
-    window.__edRen = (i, c, v) => {
+    window.__edRen = (i, campo, valor) => {
         if (!rendas[i]) return;
-        if (c === "valor") v = parseFloat(String(v).replace(",", ".")) || 0;
-        rendas[i][c] = v;
+        if (campo === "valor") {
+            valor = parseFloat(String(valor).replace(",", ".")) || 0;
+        }
+        rendas[i][campo] = valor;
+
         atualizarTotais();
         salvarMes();
     };
@@ -586,12 +582,11 @@
        TOTAIS
     ------------------------- */
     function atualizarTotais() {
-        // total de saída = soma do (valor - falta) = efetivamente pago
         const totalSaidaVal = debitos.reduce((acc, d) => {
             const valor = Number(d.valor || 0);
             const falta = Number(d.falta || 0);
             const pago = valor - falta;
-            return acc + Math.max(0, Number(pago));
+            return acc + Math.max(0, pago);
         }, 0);
 
         const totalRendasVal = rendas.reduce((acc, r) => acc + (Number(r.valor) || 0), 0);
@@ -608,12 +603,10 @@
     }
 
     /* -------------------------
-       EVENTOS BOTOES
+       EVENTOS
     ------------------------- */
     document.getElementById("addDebitoBtn").onclick = () => {
-        // por padrão, nova conta não está paga e falta == valor
-        const novo = { nome: "Novo Débito", valor: 0, falta: 0, pago: true };
-        debitos.push(novo);
+        debitos.push({ nome: "Novo Débito", valor: 0, falta: 0, pago: true });
         renderDebitos();
         salvarMes();
     };
@@ -640,11 +633,11 @@
     };
 
     /* -------------------------
-       LOGIN FLOW (onAuth)
-       cria mês atual automaticamente se não houver meses
+       ON AUTH
     ------------------------- */
     onAuthStateChanged(auth, async user => {
         if (!user) return;
+
         usuarioId = user.uid;
 
         await carregarListaMeses();
@@ -659,13 +652,12 @@
             rendas = [];
             currentMonthKey = chave;
 
-            // salva o documento para o usuário (cria subcoleção automaticamente)
             await salvarMes();
             await carregarListaMeses();
         }
 
-        // seleciona o último mês (mais recente)
         currentMonthKey = availableMonths[availableMonths.length - 1];
+
         if (currentMonthKey) {
             await carregarMes(currentMonthKey);
         }
