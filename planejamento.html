@@ -54,7 +54,7 @@
 
     onAuthStateChanged(auth, (user) => {
         if (!user) {
-            window.location.href = "login.html";
+            window.location.href = "index.html";
             return;
         }
 
@@ -622,7 +622,7 @@
 
     logoutBtn.onclick = async () => {
         await signOut(auth);
-        window.location.href = "login.html";
+        window.location.href = "index.html";
     };
 
     monthSelect.onchange = async () => {
