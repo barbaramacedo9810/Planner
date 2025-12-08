@@ -1,0 +1,214 @@
+/* =======================================================
+   RESPONSIVIDADE GLOBAL — PADRÃO PARA TODO O SITE
+======================================================= */
+
+/* Evita overflow lateral */
+html, body {
+    overflow-x: hidden;
+}
+
+/* Imagens sempre proporcionais */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Containers sempre adaptáveis */
+.container, .container-fluid,
+.container-box, .main-container,
+.login-side, .login-container {
+    max-width: 100%;
+}
+
+
+/* =======================================================
+   TELAS MÉDIAS (até 1200px)
+======================================================= */
+@media (max-width: 1200px) {
+
+    .container, .container-box, .main-container,
+    .login-side, .login-container {
+        width: 100% !important;
+        padding: 0 15px !important;
+    }
+}
+
+
+/* =======================================================
+   NOTEBOOKS / TABLETS (até 992px)
+======================================================= */
+@media (max-width: 992px) {
+
+    body {
+        padding-top: 60px !important;
+    }
+
+    h1 { font-size: 24px !important; }
+    h2 { font-size: 20px !important; }
+
+    .nav-link { font-size: 15px !important; }
+
+    /* Login / Página inicial */
+    .image-side {
+        min-height: 300px !important;
+    }
+
+    /* FullCalendar (título e barra superior) */
+    .fc-toolbar.fc-header-toolbar {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .fc-toolbar-title {
+        font-size: 1.3rem !important;
+    }
+}
+
+
+/* =======================================================
+   MOBILE (até 768px)
+======================================================= */
+@media (max-width: 768px) {
+
+    /* Layout login/index */
+    .main-container {
+        flex-direction: column !important;
+        height: auto !important;
+    }
+
+    .image-side {
+        width: 100% !important;
+        height: 300px !important;
+        background-position: center !important;
+        background-size: cover !important;
+    }
+
+    .login-side {
+        width: 100% !important;
+        padding: 15px !important;
+    }
+
+    .login-container {
+        margin: 0 auto !important;
+    }
+
+    /* Navbar */
+    .navbar-brand {
+        font-size: 18px !important;
+    }
+
+    .nav-link {
+        font-size: 16px;
+        text-align: center;
+        padding: 10px !important;
+    }
+
+    .nav-avatar {
+        width: 30px;
+        height: 30px;
+    }
+
+    /* Perfil */
+    .profile-card {
+        padding: 22px;
+        margin: 60px 12px;
+        width: 100%;
+        border-radius: 14px;
+    }
+
+    .avatar {
+        width: 90px;
+        height: 90px;
+    }
+
+    .avatar-btn {
+        font-size: 13px;
+        padding: 4px 8px;
+    }
+
+    .section-title {
+        font-size: 16px;
+        margin-top: 16px;
+    }
+
+    .form-label {
+        font-size: 14px;
+    }
+
+    input.form-control {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    #saveProfile {
+        font-size: 15px;
+        padding: 10px;
+    }
+}
+
+
+/* =======================================================
+   TELAS MUITO PEQUENAS (até 600px)
+======================================================= */
+@media (max-width: 600px) {
+
+    h1, h2, h3 {
+        font-size: 90%;
+    }
+}
+
+
+/* =======================================================
+   CELULARES PEQUENOS (até 480px)
+======================================================= */
+@media (max-width: 480px) {
+
+    .navbar-brand { font-size: 14px !important; }
+    .nav-link { font-size: 13px !important; }
+
+    h1 { font-size: 22px !important; }
+
+    .login-container {
+        padding: 20px !important;
+    }
+}
+
+
+/* =======================================================
+   EXTRA PEQUENOS (até 420px)
+======================================================= */
+@media (max-width: 420px) {
+
+    h3 {
+        font-size: 20px;
+    }
+
+    p.text-muted {
+        font-size: 13px;
+    }
+
+    .profile-card {
+        padding: 18px;
+        margin: 40px 8px;
+    }
+
+    .avatar {
+        width: 80px;
+        height: 80px;
+    }
+
+    input.form-control {
+        font-size: 13px;
+        padding: 8px;
+    }
+
+    .avatar-btn {
+        font-size: 12px;
+        padding: 3px 6px;
+    }
+
+    #saveProfile {
+        font-size: 14px;
+        padding: 8px;
+    }
+}

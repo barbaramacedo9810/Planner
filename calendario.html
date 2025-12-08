@@ -19,8 +19,16 @@
             padding-top: 80px;
         }
 
-        /* ----------- Melhorias visuais no calendário ----------- */
+        /* Avatar da navbar */
+        .nav-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ccc;
+        }
 
+        /* ----------- Melhorias visuais no calendário ----------- */
         #calendar {
             border-radius: 12px;
             overflow: hidden;
@@ -48,6 +56,10 @@
             font-weight: 600;
         }
     </style>
+
+    <!-- O RESPONSIVE fica sempre DEPOIS do CSS interno -->
+    <link rel="stylesheet" href="responsive.css">
+
 </head>
 
 <body class="bg-light">
@@ -67,8 +79,8 @@
     });
 </script>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg fixed-top custom-navbar bg-white shadow-sm">
+<!-- NAVBAR CORRIGIDA -->
+<nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm">
     <div class="container-fluid">
 
         <a class="navbar-brand d-flex align-items-center" href="index.html">
@@ -90,13 +102,18 @@
                 <li class="nav-item"><a class="nav-link active" href="calendario.html"><i class="bi bi-calendar3"></i> Calendário</a></li>
                 <li class="nav-item"><a class="nav-link" href="perfil.html"><i class="bi bi-person-circle"></i> Perfil</a></li>
 
+                <!-- FOTO DO USUÁRIO -->
+                <li class="nav-item d-flex align-items-center ms-3">
+                    <img id="navUserPhoto" src="img/login.png" class="nav-avatar">
+                </li>
+
+                <!-- BOTÃO SAIR -->
                 <li class="nav-item ms-3">
                     <button id="logoutBtn" class="btn btn-danger btn-sm">Sair</button>
                 </li>
 
             </ul>
         </div>
-
     </div>
 </nav>
 
@@ -168,7 +185,19 @@
 
     let usuarioId = null;
 
-    /* LOGIN PROTEGIDO - versão oficial (sem duplicação!) */
+    /* ================================================
+       1. FOTO DO USUÁRIO NA NAVBAR
+    ================================================= */
+    onAuthStateChanged(auth, user => {
+        const navPhoto = document.getElementById("navUserPhoto");
+        if (user && navPhoto) {
+            navPhoto.src = user.photoURL || "img/login.png";
+        }
+    });
+
+    /* ================================================
+       2. PROTEÇÃO DE LOGIN + CHAMADA DO CALENDÁRIO
+    ================================================= */
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
             window.location.href = "index.html";
@@ -176,14 +205,16 @@
         }
 
         usuarioId = user.uid;
-        carregarCalendario();
+
+        carregarCalendario();  // CORRETO
+
+        document.getElementById("logoutBtn").onclick = () => signOut(auth);
     });
 
-    document.getElementById("logoutBtn").onclick = () => signOut(auth);
 
-    /* ------------------------------------------------------------
-       FUNÇÃO PRINCIPAL: CONSTRUIR O CALENDÁRIO
-    ------------------------------------------------------------ */
+    /* ================================================
+       3. FUNÇÃO PRINCIPAL DO CALENDÁRIO CORRIGIDA
+    ================================================= */
     async function carregarCalendario() {
 
         const modal = new bootstrap.Modal(document.getElementById("eventModal"));
@@ -275,6 +306,7 @@
     }
 
 </script>
+
 
 </body>
 </html>

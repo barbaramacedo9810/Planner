@@ -38,11 +38,24 @@
         }
 
         .table-responsive { overflow-x: auto; }
+
+        /* Avatar da navbar (padroniza o tamanho e evita quebrar layout) */
+        .nav-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #eee;
+        }
     </style>
+
+    <!-- O RESPONSIVE fica sempre DEPOIS do CSS interno -->
+    <link rel="stylesheet" href="responsive.css">
+
 </head>
 <body>
 
-<!-- Proteção de login (versão CORRETA que evita ver a página sem login) -->
+<!-- Proteção de login (esconde página até validar login) -->
 <script type="module">
     import app from "./firebase.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -84,7 +97,10 @@
                 <li class="nav-item"><a class="nav-link" href="calendario.html"><i class="bi bi-calendar3"></i> Calendário</a></li>
                 <li class="nav-item"><a class="nav-link" href="perfil.html"><i class="bi bi-person-circle"></i> Perfil</a></li>
 
-
+                <!-- FOTO DO USUÁRIO (mantém o layout) -->
+                <li class="nav-item d-flex align-items-center ms-3">
+                    <img id="navUserPhoto" src="img/login.png" alt="Usuário" class="nav-avatar">
+                </li>
 
                 <li class="nav-item ms-3">
                     <button id="logoutBtn" class="btn btn-danger btn-sm">Sair</button>
@@ -95,7 +111,7 @@
 </nav>
 
 <!-- CONTEÚDO PRINCIPAL -->
-<div class="main-wrapper">
+<div class="main-wrapper container mt-4">
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1>Planejamento Financeiro</h1>
@@ -513,9 +529,17 @@
 
     /* -------------------------
        OPERAÇÕES INLINE - DÉBITOS
+       (Ajuste: ao editar 'nome' NÃO re-renderizamos a tabela para evitar perda de foco)
     ------------------------- */
     window.__edDeb = (i, campo, v) => {
         if (!debitos[i]) return;
+
+        if (campo === "nome") {
+            // atualiza somente o campo nome (não re-renderiza para não perder foco)
+            debitos[i].nome = v;
+            salvarMes(); // salva ao digitar
+            return;
+        }
 
         if (campo === "valor" || campo === "falta") {
             const num = parseFloat(String(v).replace(",", ".")) || 0;
@@ -532,7 +556,6 @@
             if (campo === "valor" && debitos[i].falta > debitos[i].valor) {
                 debitos[i].falta = debitos[i].valor;
             }
-
         } else {
             debitos[i][campo] = v;
         }
@@ -636,10 +659,14 @@
     };
 
     /* -------------------------
-       ON AUTH
+       ON AUTH (único handler para foto + inicialização)
     ------------------------- */
     onAuthStateChanged(auth, async user => {
         if (!user) return;
+
+        // FOTO NA NAVBAR (quando loga ou atualiza photoURL)
+        const navPhoto = document.getElementById("navUserPhoto");
+        if (navPhoto) navPhoto.src = user.photoURL ? user.photoURL : "img/login.png";
 
         usuarioId = user.uid;
 

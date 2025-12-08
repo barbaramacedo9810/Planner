@@ -111,3 +111,16 @@ export function observarUsuario(callback) {
         }
     });
 }
+
+/* ======================================================
+   CONTROLE DA NAVBAR (FOTO DO USUÁRIO)
+====================================================== */
+export function controlarNavbar() {
+    onAuthStateChanged(auth, (user) => {
+        const fotoNav = document.getElementById("navUserPhoto");
+
+        if (!fotoNav) return; // página sem navbar
+
+        fotoNav.src = user?.photoURL || "img/login.png";
+    });
+}
