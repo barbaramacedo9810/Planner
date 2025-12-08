@@ -18,8 +18,39 @@
         body {
             padding-top: 80px;
         }
+
+        /* ----------- Melhorias visuais no calendário ----------- */
+
+        #calendar {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .fc-daygrid-day {
+            transition: background 0.2s;
+        }
+
+        .fc-daygrid-day:hover {
+            background: #f7f7f7;
+        }
+
+        .fc-daygrid-day-number {
+            font-weight: 600;
+        }
+
+        .fc-event {
+            border-radius: 6px;
+            padding: 3px 6px;
+        }
+
+        .fc-toolbar-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
     </style>
 </head>
+
+<body class="bg-light">
 
 <!-- 🔐 PROTEÇÃO DE LOGIN -->
 <script type="module">
@@ -35,8 +66,6 @@
         }
     });
 </script>
-
-<body class="bg-light">
 
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg fixed-top custom-navbar bg-white shadow-sm">
@@ -115,9 +144,6 @@
 
 <script type="module">
 
-    /* ------------------------------------------------------------
-       FIREBASE
-    ------------------------------------------------------------ */
     import app from "./firebase.js";
 
     import {
@@ -141,9 +167,7 @@
 
     let usuarioId = null;
 
-    /* ------------------------------------------------------------
-       LOGIN PROTEGIDO
-    ------------------------------------------------------------ */
+    /* LOGIN PROTEGIDO - versão oficial (sem duplicação!) */
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
             window.location.href = "index.html";
@@ -184,7 +208,6 @@
             editable: true,
             events: eventos,
 
-            /* Criar evento */
             dateClick(info) {
                 document.querySelector(".modal-title").innerText = "Novo Evento";
                 document.getElementById("event-id").value = "";
@@ -194,7 +217,6 @@
                 modal.show();
             },
 
-            /* Editar evento */
             eventClick(info) {
                 document.querySelector(".modal-title").innerText = "Editar Evento";
                 document.getElementById("event-id").value = info.event.id;
@@ -204,7 +226,6 @@
                 modal.show();
             },
 
-            /* Arrastar evento */
             async eventDrop(info) {
                 await updateDoc(doc(db, `usuarios/${usuarioId}/eventos/${info.event.id}`), {
                     title: info.event.title,
@@ -215,9 +236,7 @@
 
         calendar.render();
 
-        /* ------------------------------------------------------------
-           SALVAR EVENTO
-        ------------------------------------------------------------ */
+        /* SALVAR EVENTO */
         document.getElementById("save-event").onclick = async () => {
             const id = document.getElementById("event-id").value;
             const title = document.getElementById("event-title").value.trim();
@@ -226,13 +245,11 @@
             if (!title) return alert("Digite o título");
 
             if (id === "") {
-                // Criar novo
                 const ref = await addDoc(collection(db, `usuarios/${usuarioId}/eventos`), {
                     title, date
                 });
                 calendar.addEvent({ id: ref.id, title, start: date });
             } else {
-                // Atualizar
                 await updateDoc(doc(db, `usuarios/${usuarioId}/eventos/${id}`), {
                     title, date
                 });
@@ -244,9 +261,7 @@
             modal.hide();
         };
 
-        /* ------------------------------------------------------------
-           EXCLUIR EVENTO
-        ------------------------------------------------------------ */
+        /* EXCLUIR EVENTO */
         document.getElementById("delete-event").onclick = async () => {
             const id = document.getElementById("event-id").value;
             await deleteDoc(doc(db, `usuarios/${usuarioId}/eventos/${id}`));
