@@ -1,202 +1,192 @@
-/* =======================================================
-   RESPONSIVIDADE GLOBAL — PADRÃO PARA TODO O SITE
-======================================================= */
+/* ==========================================================
+   RESPONSIVIDADE DA PÁGINA DE LOGIN (index.html)
+   ========================================================== */
 
-/* Evita scroll lateral */
-html, body {
-    overflow-x: hidden;
-}
-
-/* Imagens proporcionais */
-img {
-    max-width: 100%;
-    height: auto;
-}
-
-/* Containers flexíveis */
-.container,
-.container-fluid,
-.container-box,
-.main-wrapper,
-.main-container,
-.login-side,
-.login-container {
-    max-width: 100%;
-}
-
-
-
-/* =======================================================
-   TELAS MÉDIAS (até 1200px)
-======================================================= */
-@media (max-width: 1200px) {
-
-    .container,
-    .container-box,
-    .main-container,
-    .login-side,
-    .login-container {
-        width: 100%;
-        padding: 0 15px;
-    }
-
-    /* Planejamento: evita compressão do texto */
-    .resumo-box .resumo-content {
-        padding-right: 120px;
-    }
-}
-
-
-
-/* =======================================================
-   NOTEBOOKS / TABLETS (até 992px)
-======================================================= */
-@media (max-width: 992px) {
-
-    body {
-        padding-top: 60px !important;
-    }
-
-    h1 { font-size: 26px; }
-    h2 { font-size: 20px; }
-
-    /* Login — mantém imagem */
-    .image-side {
-        background-size: contain !important;
-        background-position: top left !important;
-        min-height: 260px !important;
-    }
-
-    /* Planejamento: imagens decorativas menores */
-    .resumo-img {
-        width: 900px !important;
-        right: -320px !important;
-        bottom: -240px !important;
-    }
-
-    .menininha-img {
-        width: 550px !important;
-        left: -160px !important;
-        bottom: -120px !important;
-    }
-}
-
-
-/* =======================================================
-   MOBILE (até 768px)
-======================================================= */
-@media (max-width: 768px) {
-
-    /* LOGIN — mantém imagem e layout */
-    .main-container {
-        flex-direction: column;
-        height: auto;
-    }
-
-    .image-side {
-        width: 100%;
-        height: 300px;
-        background-position: center !important;
-        background-size: cover !important;
-    }
+/* -----------  DESKTOP (+1200px) ----------- */
+@media (min-width: 1200px) {
 
     .login-side {
-        width: 100%;
-        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-right: 40px;
     }
 
     .login-container {
         max-width: 420px;
-        margin: auto;
     }
 
-    /* NAVBAR */
-    .nav-link {
+    .image-side {
+        background-size: contain;
+        background-position: left center;
+    }
+}
+
+/* -----------  TABLET (768–1199px) ----------- */
+@media (min-width: 768px) and (max-width: 1199px) {
+
+    body {
+        background-color: #FFF5E6 !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding-top: 56px;
+    }
+
+    .main-container {
+        width: 95%;
+        max-width: 1000px;
+        height: auto;
+        min-height: 600px;
+
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: center;
+
+        background: rgba(255, 255, 255, 0.35);
+        backdrop-filter: blur(12px);
+        border-radius: 35px;
+        overflow: hidden;
+
+        box-shadow: 0px 15px 40px rgba(0,0,0,0.25);
+    }
+
+    .image-side {
+        flex: 1;
+        background-size: cover !important;
+        background-position: center !important;
+    }
+
+    .login-side {
+        flex: 1;
+        background-color: #FFF5E6 !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 25px !important;
+    }
+
+    .login-container {
+        width: 100%;
+        max-width: 330px !important;
+    }
+
+    .form-control {
+        padding: 12px;
         font-size: 15px;
-        text-align: center;
-        padding: 10px;
     }
 
-    .nav-avatar {
-        width: 32px;
-        height: 32px;
+    .btn-entrar {
+        padding: 12px;
+        font-size: 16px;
     }
 
-    /* PLANEJAMENTO: melhora leitura */
-    .resumo-img,
-    .menininha-img {
+    .btn-criar {
+        margin-top: 12px;
+        font-size: 14px;
+    }
+}
+
+/* -----------  MOBILE (até 767px) ----------- */
+@media (max-width: 767px) {
+
+    .image-side {
         display: none !important;
     }
 
-    .table-responsive {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+    body {
+        background-color: #FFF5E6;
     }
 
-    .resumo-box,
-    .affirm-box {
-        min-height: auto;
+    .main-container {
+        flex-direction: column;
+        align-items: center;
+        background-color: #FFF5E6;
     }
-}
 
-
-/* =======================================================
-   TELAS MUITO PEQUENAS (até 600px)
-======================================================= */
-@media (max-width: 600px) {
-
-    h1, h2, h3 {
-        font-size: 90%;
+    .login-side {
+        width: 100%;
+        display: flex;
+        justify-content: center;
     }
 
     .login-container {
-        padding: 18px;
+        width: 90%;
+        max-width: 400px;
+        margin: 30px 0;
     }
 }
 
 
+/* ==========================================================
+   RESPONSIVIDADE DA PÁGINA PLANEJAMENTO FINANCEIRO (planejamento.html)
+   ========================================================== */
 
-/* =======================================================
-   CELULARES PEQUENOS (até 480px)
-======================================================= */
-@media (max-width: 480px) {
+/* -----------  DESKTOP (+1200px) ----------- */
+@media (min-width: 1200px) {
 
-    .navbar-brand { font-size: 14px; }
-    .nav-link { font-size: 13px; }
+    .main-wrapper {
+        width: 100% !important;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
 
-    .login-container {
-        padding: 18px;
+    .col-tabela {
+        width: 100%;
+    }
+
+    .col-info {
+        width: 100%;
+        max-width: 350px;
+    }
+
+    .col-info img,
+    .col-tabela img {
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
     }
 }
 
+/* -----------  TABLET (768–1199px) ----------- */
+@media (min-width: 768px) and (max-width: 1199px) {
 
-
-/* =======================================================
-   EXTRA PEQUENOS (até 420px)
-======================================================= */
-@media (max-width: 420px) {
-
-    h3 { font-size: 18px; }
-
-    p.text-muted { font-size: 13px; }
-
-    .profile-card {
-        padding: 18px;
-        margin: 40px 8px;
+    .main-wrapper {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        width: 100%;
     }
 
-    .avatar {
-        width: 80px;
-        height: 80px;
+    .col-info {
+        max-width: 90%;
+        margin: 0 auto;
     }
 
-    input.form-control {
-        font-size: 13px;
-        padding: 8px;
+    .col-info img {
+        max-width: 80%;
+    }
+}
+
+/* -----------  MOBILE (até 767px) ----------- */
+@media (max-width: 767px) {
+
+    .main-wrapper {
+        padding: 10px;
+        flex-direction: column;
     }
 
-    #saveProfile {
-        font-size: 14px;
-        padding: 8px;
+    .col-info {
+        order: 2;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .col-info img {
+        max-width: 70%;
+        display: block;
+        margin: 0 auto;
     }
 }
