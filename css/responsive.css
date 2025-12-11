@@ -119,74 +119,101 @@
     }
 }
 
-
-/* ==========================================================
-   RESPONSIVIDADE DA PÁGINA PLANEJAMENTO FINANCEIRO (planejamento.html)
-   ========================================================== */
-
-/* -----------  DESKTOP (+1200px) ----------- */
-@media (min-width: 1200px) {
-
-    .main-wrapper {
-        width: 100% !important;
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-
-    .col-tabela {
-        width: 100%;
-    }
-
-    .col-info {
-        width: 100%;
-        max-width: 350px;
-    }
-
-    .col-info img,
-    .col-tabela img {
-        max-width: 100%;
-        height: auto;
-        object-fit: contain;
-    }
-}
-
-/* -----------  TABLET (768–1199px) ----------- */
+/* ————————————————————————————————
+   TABLET (entre 768px e 1199px)
+   Imagens DECORAM, mas menores e alinhadas
+   ———————————————————————————————— */
 @media (min-width: 768px) and (max-width: 1199px) {
 
     .main-wrapper {
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-        width: 100%;
+        max-width: 900px;
+        padding: 20px;
+        margin: 80px auto 40px;
     }
 
-    .col-info {
-        max-width: 90%;
-        margin: 0 auto;
+    h1 { font-size: 26px; }
+
+    /* Corrigir porquinho EM TODAS AS TELAS */
+    .resumo-box .resumo-img {
+        position: absolute !important;
+        bottom: 70px !important;   /* Ajuste fino baseado na sua captura */
+        right: 85px !important;    /* Centraliza como na imagem */
+        width: 550px !important;   /* Tamanho igual ao print */
+        left: auto !important;     /* REMOVE o left antigo */
+        max-width: none !important; /* Remove largura gigante */
+        margin: -227px !important;
+        pointer-events: none;
     }
 
-    .col-info img {
-        max-width: 80%;
+    /* Menininha alinhada corretamente */
+    .menininha-img {
+        position: absolute;
+        bottom: -95px;     /* desce um pouco para não colar no topo */
+        right: -250px;      /* antes ficava em -170px, agora fica dentro */
+        width: 600px;     /* reduzido para caber sem cortar */
+        pointer-events: none;
+    }
+
+
+    /* Ajusta boxes para caber no tablet */
+    .resumo-box {
+        padding-bottom: 140px; /* espaço para a imagem menor */
+    }
+
+    .affirm-box {
+        padding-bottom: 160px;
     }
 }
 
-/* -----------  MOBILE (até 767px) ----------- */
+/* ————————————————————————————————
+   CELULAR (< 768px)
+   Imagens somem, tudo fica em coluna
+   ———————————————————————————————— */
 @media (max-width: 767px) {
 
     .main-wrapper {
-        padding: 10px;
-        flex-direction: column;
+        padding: 16px;
+        border-radius: 10px;
+        margin-top: 70px;
     }
 
-    .col-info {
-        order: 2;
-        width: 100%;
+    h1 {
+        font-size: 24px;
+        text-align: center;
+    }
+
+    /* Some tudo que quebra layout no mobile */
+    .resumo-img,
+    .menininha-img {
+        display: none !important;
+    }
+
+    /* Ajustes gerais */
+    .resumo-box,
+    .affirm-box {
+        min-height: auto;
+        padding-bottom: 20px;
+    }
+
+    .renda-card {
         margin-top: 20px;
     }
 
-    .col-info img {
-        max-width: 70%;
-        display: block;
-        margin: 0 auto;
+    /* Tabela mobile rolável */
+    .table-responsive {
+        border-radius: 10px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
+
+    /* Textos menores */
+    .nav-link { font-size: 15px !important; }
+    .navbar-brand { font-size: 16px !important; }
 }
+
+/* ————————————————————————————————
+   CELULAR PEQUENO (< 420px)
+   ———————————————————————————————— */
+@media (max-width: 420px) {
+    h1 { font-size: 20px; }
+    .navbar-brand { font-size: 14px !important; }
