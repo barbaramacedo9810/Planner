@@ -1,4 +1,5 @@
 import app, { db } from "./firebase.js";
+
 import {
     getAuth,
     onAuthStateChanged,
@@ -9,13 +10,37 @@ import {
 import {
     doc,
     getDoc,
-    updateDoc
+    setDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const auth = getAuth(app);
+import {
+    getStorage,
+    ref,
+    uploadBytes,
+    getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 /* =========================================================
-   CARREGAR DADOS DO USUÁRIO AO ABRIR A PÁGINA
+   CONFIG
+========================================================= */
+const auth = getAuth(app);
+const storage = getStorage(app);
+
+/* =========================================================
+   UPLOAD DA FOTO DE PERFIL
+========================================================= */
+async function uploadProfilePhoto(file, uid) {
+    const storageRef = ref(storage, `usuarios/${uid}/perfil.jpg`);
+
+    // envia arquivo
+    await uploadBytes(storageRef, file);
+
+    // retorna URL
+    return await getDownloadURL(storageRef);
+}
+
+/* =========================================================
+   CARREGAR DADOS AO ABRIR A PÁGINA
 ========================================================= */
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -23,43 +48,34 @@ onAuthStateChanged(auth, async (user) => {
         return;
     }
 
-    // Preenche e-mail (vem do Auth)
-    const emailInput = document.getElementById("email");
-    emailInput.value = user.email;
-
-    // Preenche nome (Firestore → Auth → vazio)
+    // email vem do Auth
+    document.getElementById("email").value = user.email;
     const nameInput = document.getElementById("displayName");
 
     try {
-        const snap = await getDoc(doc(db, "users", user.uid));
+        const snap = await getDoc(doc(db, "usuarios", user.uid));
 
         if (snap.exists() && snap.data().nome) {
-            // Nome existe no Firestore
             nameInput.value = snap.data().nome;
         } else if (user.displayName) {
-            // Nome existe no Auth
             nameInput.value = user.displayName;
         } else {
-            // Nenhum nome → campo vazio
             nameInput.value = "";
         }
-
     } catch (error) {
         console.error("Erro ao carregar nome:", error);
         nameInput.value = "";
     }
 
-
-    // Foto
+    // foto
     const avatar = document.getElementById("avatarPreview");
     if (user.photoURL) {
         avatar.src = user.photoURL;
     }
 });
 
-
 /* =========================================================
-   ALTERAR FOTO (pré-visualização simples)
+   PRÉ-VISUALIZAÇÃO DA FOTO
 ========================================================= */
 document.getElementById("photoFile").addEventListener("change", (e) => {
     const file = e.target.files[0];
@@ -67,7 +83,6 @@ document.getElementById("photoFile").addEventListener("change", (e) => {
         document.getElementById("avatarPreview").src = URL.createObjectURL(file);
     }
 });
-
 
 /* =========================================================
    ALTERAR SENHA
@@ -98,14 +113,17 @@ document.getElementById("changePassword").addEventListener("click", async () => 
     }
 });
 
-
 /* =========================================================
-   SALVAR ALTERAÇÕES (nome)
+   SALVAR PERFIL (nome + foto)
 ========================================================= */
 document.getElementById("saveProfile").addEventListener("click", async () => {
     const name = document.getElementById("displayName").value.trim();
     const msg = document.getElementById("profileMsg");
+    const file = document.getElementById("photoFile").files[0];
+    const uid = auth.currentUser.uid;
+
     msg.textContent = "";
+    msg.style.color = "red";
 
     if (!name) {
         msg.textContent = "O nome não pode ser vazio!";
@@ -113,19 +131,42 @@ document.getElementById("saveProfile").addEventListener("click", async () => {
     }
 
     try {
-        // Salva no Auth
+        /* -----------------------------
+            1. Atualiza nome no Auth
+        ------------------------------ */
         await updateProfile(auth.currentUser, { displayName: name });
 
-        // Salva no Firestore
-        await updateDoc(doc(db, "users", auth.currentUser.uid), {
-            nome: name,
-            ultAtualizacao: new Date()
-        });
+        /* -----------------------------
+            2. Upload da foto (se existir)
+        ------------------------------ */
+        let photoURL = auth.currentUser.photoURL;
+
+        if (file) {
+            photoURL = await uploadProfilePhoto(file, uid);
+            await updateProfile(auth.currentUser, { photoURL });
+        }
+
+        /* -----------------------------
+            3. Salva no Firestore
+        ------------------------------ */
+        await setDoc(
+            doc(db, "usuarios", uid),
+            {
+                nome: name,
+                fotoURL: photoURL || null,
+                ultAtualizacao: new Date()
+            },
+            { merge: true }
+        );
 
         msg.style.color = "green";
         msg.textContent = "Perfil atualizado com sucesso!";
+
+        if (photoURL) {
+            document.getElementById("avatarPreview").src = photoURL;
+        }
+
     } catch (error) {
-        msg.style.color = "red";
         msg.textContent = "Erro ao salvar: " + error.message;
     }
 });
