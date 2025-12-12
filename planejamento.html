@@ -130,6 +130,7 @@
         <div class="resumo-content">
             <p>Total de Saída: <strong id="resumoSaida">R$ 0,00</strong></p>
             <p>Total de Rendas: <strong id="resumoRendas">R$ 0,00</strong></p>
+            <p>Total Faltante: <strong id="totalFaltante">R$ 0,00</strong></p>
             <p>Saldo Final: <strong id="saldoFinal">R$ 0,00</strong></p>
         </div>
 
@@ -529,15 +530,13 @@
 
     /* -------------------------
        OPERAÇÕES INLINE - DÉBITOS
-       (Ajuste: ao editar 'nome' NÃO re-renderizamos a tabela para evitar perda de foco)
     ------------------------- */
     window.__edDeb = (i, campo, v) => {
         if (!debitos[i]) return;
 
         if (campo === "nome") {
-            // atualiza somente o campo nome (não re-renderiza para não perder foco)
             debitos[i].nome = v;
-            salvarMes(); // salva ao digitar
+            salvarMes();
             return;
         }
 
@@ -605,9 +604,11 @@
     };
 
     /* -------------------------
-       TOTAIS
+       TOTAIS (NOVA FUNÇÃO COMPLETA)
     ------------------------- */
     function atualizarTotais() {
+
+        // Total pago (saída já paga)
         const totalSaidaVal = debitos.reduce((acc, d) => {
             const valor = Number(d.valor || 0);
             const falta = Number(d.falta || 0);
@@ -615,15 +616,31 @@
             return acc + Math.max(0, pago);
         }, 0);
 
-        const totalRendasVal = rendas.reduce((acc, r) => acc + (Number(r.valor) || 0), 0);
+        // Total de rendas
+        const totalRendasVal = rendas.reduce((acc, r) => {
+            return acc + (Number(r.valor) || 0);
+        }, 0);
+
+        // ➕ NOVO: Total Faltante
+        const totalFaltante = debitos.reduce((acc, d) => {
+            return acc + (Number(d.falta) || 0);
+        }, 0);
+
+        // Saldo Final considerando apenas o pago
         const saldoVal = totalRendasVal - totalSaidaVal;
 
         totalSaidaFooter.innerText = formatBRL(totalSaidaVal);
         totalRendasEl.innerText = formatBRL(totalRendasVal);
         resumoSaidaEl.innerText = formatBRL(totalSaidaVal);
         resumoRendasEl.innerText = formatBRL(totalRendasVal);
-        saldoFinalEl.innerText = formatBRL(saldoVal);
 
+        // Atualiza o Total Faltante
+        const faltanteEl = document.getElementById("totalFaltante");
+        if (faltanteEl) {
+            faltanteEl.innerText = formatBRL(totalFaltante);
+        }
+
+        saldoFinalEl.innerText = formatBRL(saldoVal);
         saldoFinalEl.classList.toggle("text-danger", saldoVal < 0);
         saldoFinalEl.classList.toggle("text-success", saldoVal >= 0);
     }
@@ -659,12 +676,11 @@
     };
 
     /* -------------------------
-       ON AUTH (único handler para foto + inicialização)
+       ON AUTH
     ------------------------- */
     onAuthStateChanged(auth, async user => {
         if (!user) return;
 
-        // FOTO NA NAVBAR (quando loga ou atualiza photoURL)
         const navPhoto = document.getElementById("navUserPhoto");
         if (navPhoto) navPhoto.src = user.photoURL ? user.photoURL : "img/login.png";
 
@@ -694,5 +710,6 @@
     });
 
 </script>
+
 </body>
 </html>
