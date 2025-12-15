@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Calendário</title>
 
     <!-- BOOTSTRAP -->
@@ -11,78 +11,34 @@
     <!-- FULLCALENDAR -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css">
 
-    <!-- Ícones Bootstrap -->
+    <!-- ICONES -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
-        body {
-            padding-top: 80px;
-        }
-
-        /* Avatar da navbar */
-        .nav-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #ccc;
-        }
-
-        /* ----------- Melhorias visuais no calendário ----------- */
-        #calendar {
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .fc-daygrid-day {
-            transition: background 0.2s;
-        }
-
-        .fc-daygrid-day:hover {
-            background: #f7f7f7;
-        }
-
-        .fc-daygrid-day-number {
-            font-weight: 600;
-        }
-
-        .fc-event {
-            border-radius: 6px;
-            padding: 3px 6px;
-        }
-
-        .fc-toolbar-title {
-            font-size: 1.6rem;
-            font-weight: 600;
-        }
+        body { padding-top: 80px; }
+        #calendar { border-radius: 12px; }
+        .fc-event { border-radius: 6px; padding: 3px 6px; font-size: 0.85rem; }
     </style>
 
-    <!-- O RESPONSIVE fica sempre DEPOIS do CSS interno -->
     <link rel="stylesheet" href="css/responsive.css">
-
 </head>
 
 <body class="bg-light">
 
-<!-- 🔐 PROTEÇÃO DE LOGIN -->
+<!-- 🔐 PROTEÇÃO -->
 <script type="module">
     import app from "./firebase.js";
-    import { getAuth, onAuthStateChanged }
-        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const auth = getAuth(app);
-
-    onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            window.location.href = "index.html";
-        }
+    onAuthStateChanged(auth, user => {
+        if (!user) window.location.href = "index.html";
     });
 </script>
 
-<!-- NAVBAR CORRIGIDA -->
-<nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm">
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top custom-navbar bg-white shadow-sm">
     <div class="container-fluid">
-
         <a class="navbar-brand d-flex align-items-center" href="index.html">
             <i class="bi bi-journal-check" style="font-size:22px; margin-right:6px;"></i>
             Planejamento
@@ -94,24 +50,20 @@
 
         <div class="collapse navbar-collapse" id="menu">
             <ul class="navbar-nav ms-auto">
-
                 <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house-door"></i> Início</a></li>
                 <li class="nav-item"><a class="nav-link" href="planejamento.html"><i class="bi bi-cash-stack"></i> Planejamento</a></li>
-                <li class="nav-item"><a class="nav-link" href="praia.html"><i class="bi bi-sun"></i> Praia</a></li>
+                <li class="nav-item"><a class="nav-link active" href="praia.html"><i class="bi bi-sun"></i> Praia</a></li>
                 <li class="nav-item"><a class="nav-link" href="atrasadas.html"><i class="bi bi-exclamation-triangle"></i> Atrasadas</a></li>
-                <li class="nav-item"><a class="nav-link active" href="calendario.html"><i class="bi bi-calendar3"></i> Calendário</a></li>
+                <li class="nav-item"><a class="nav-link" href="calendario.html"><i class="bi bi-calendar3"></i> Calendário</a></li>
                 <li class="nav-item"><a class="nav-link" href="perfil.html"><i class="bi bi-person-circle"></i> Perfil</a></li>
 
-                <!-- FOTO DO USUÁRIO -->
-                <li class="nav-item d-flex align-items-center ms-3">
-                    <img id="navUserPhoto" src="img/login.png" class="nav-avatar">
-                </li>
+                <img id="navUserPhoto" class="rounded-circle ms-3"
+                     src="img/login.png" width="38" height="38"
+                     style="object-fit:cover; border:2px solid #ddd;">
 
-                <!-- BOTÃO SAIR -->
                 <li class="nav-item ms-3">
                     <button id="logoutBtn" class="btn btn-danger btn-sm">Sair</button>
                 </li>
-
             </ul>
         </div>
     </div>
@@ -122,28 +74,44 @@
     <div id="calendar" class="bg-white p-3 rounded shadow"></div>
 </div>
 
-<!-- MODAL EVENTO -->
-<div class="modal fade" id="eventModal" tabindex="-1">
+<!-- MODAL -->
+<div class="modal fade" id="eventModal">
     <div class="modal-dialog">
         <div class="modal-content">
 
             <div class="modal-header">
                 <h5 class="modal-title">Evento</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body">
                 <input type="hidden" id="event-id">
 
-                <div class="mb-3">
-                    <label class="form-label">Título</label>
-                    <input type="text" id="event-title" class="form-control">
-                </div>
+                <label class="form-label">Título</label>
+                <input type="text" id="event-title" class="form-control mb-2">
 
-                <div class="mb-3">
-                    <label class="form-label">Data</label>
-                    <input type="date" id="event-date" class="form-control" readonly>
-                </div>
+                <label class="form-label">Data inicial</label>
+                <input type="date" id="event-start" class="form-control mb-2">
+
+                <label class="form-label">Hora inicial</label>
+                <input type="time" id="event-start-time" class="form-control mb-2">
+
+                <label class="form-label">Data final</label>
+                <input type="date" id="event-end" class="form-control mb-2">
+
+                <label class="form-label">Hora final</label>
+                <input type="time" id="event-end-time" class="form-control mb-2">
+
+                <label class="form-label">Tipo do evento</label>
+                <select id="event-type" class="form-select mb-2">
+                    <option value="trabalho">Trabalho</option>
+                    <option value="pessoal">Pessoal</option>
+                    <option value="viagem">Viagem</option>
+                    <option value="estudo">Estudo</option>
+                </select>
+
+                <label class="form-label">Cor do evento</label>
+                <input type="color" id="event-color" class="form-control form-control-color mb-2">
             </div>
 
             <div class="modal-footer">
@@ -156,157 +124,157 @@
     </div>
 </div>
 
-<!-- SCRIPTS -->
+<!-- BOOTSTRAP JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- FULLCALENDAR JS -->
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
+<!-- SCRIPT -->
 <script type="module">
-
     import app from "./firebase.js";
-
-    import {
-        getAuth,
-        onAuthStateChanged,
-        signOut
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-    import {
-        getFirestore,
-        collection,
-        getDocs,
-        addDoc,
-        updateDoc,
-        deleteDoc,
-        doc
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const auth = getAuth(app);
     const db = getFirestore(app);
 
     let usuarioId = null;
+    let calendar = null;
 
-    /* ================================================
-       1. FOTO DO USUÁRIO NA NAVBAR
-    ================================================= */
-    onAuthStateChanged(auth, user => {
-        const navPhoto = document.getElementById("navUserPhoto");
-        if (user && navPhoto) {
-            navPhoto.src = user.photoURL || "img/login.png";
-        }
-    });
+    const coresPorTipo = {
+        trabalho: "#0d6efd",
+        pessoal: "#198754",
+        viagem: "#fd7e14",
+        estudo: "#6f42c1"
+    };
 
-    /* ================================================
-       2. PROTEÇÃO DE LOGIN + CHAMADA DO CALENDÁRIO
-    ================================================= */
-    onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-            window.location.href = "index.html";
-            return;
-        }
+    // Função para ajustar cor do texto conforme cor de fundo
+    function ajustarCorTextoEvento(corFundo) {
+        const r = parseInt(corFundo.substr(1,2),16);
+        const g = parseInt(corFundo.substr(3,2),16);
+        const b = parseInt(corFundo.substr(5,2),16);
+        const luminancia = 0.2126*r + 0.7152*g + 0.0722*b;
+        return luminancia < 128 ? "white" : "black";
+    }
+
+    onAuthStateChanged(auth, async user => {
+        if (!user) return;
 
         usuarioId = user.uid;
-
-        carregarCalendario();  // CORRETO
-
+        document.getElementById("navUserPhoto").src = user.photoURL || "img/login.png";
         document.getElementById("logoutBtn").onclick = () => signOut(auth);
+
+        carregarCalendario();
     });
 
-
-    /* ================================================
-       3. FUNÇÃO PRINCIPAL DO CALENDÁRIO CORRIGIDA
-    ================================================= */
     async function carregarCalendario() {
 
         const modal = new bootstrap.Modal(document.getElementById("eventModal"));
-        const calendarEl = document.getElementById("calendar");
 
-        /* --- Buscar eventos do usuário --- */
-        const eventos = [];
-        const snap = await getDocs(collection(db, `usuarios/${usuarioId}/eventos`));
+        const elId = document.getElementById("event-id");
+        const elTitle = document.getElementById("event-title");
+        const elStart = document.getElementById("event-start");
+        const elStartTime = document.getElementById("event-start-time");
+        const elEnd = document.getElementById("event-end");
+        const elEndTime = document.getElementById("event-end-time");
+        const elType = document.getElementById("event-type");
+        const elColor = document.getElementById("event-color");
+        const btnSave = document.getElementById("save-event");
+        const btnDelete = document.getElementById("delete-event");
 
-        snap.forEach(d => {
-            eventos.push({
-                id: d.id,
-                title: d.data().title,
-                start: d.data().date
-            });
+        // Atualiza a cor do texto no modal instantaneamente quando muda a cor
+        elColor.addEventListener("input", () => {
+            elTitle.style.color = ajustarCorTextoEvento(elColor.value);
         });
 
-        /* --- Iniciar o calendário --- */
-        const calendar = new FullCalendar.Calendar(calendarEl, {
+        const eventos = [];
+        const snap = await getDocs(collection(db, `usuarios/${usuarioId}/eventos`));
+        snap.forEach(d => eventos.push({ id: d.id, ...d.data() }));
+
+        calendar = new FullCalendar.Calendar(document.getElementById("calendar"), {
             locale: "pt-br",
             initialView: "dayGridMonth",
+            headerToolbar: { left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek,timeGridDay" },
             selectable: true,
             editable: true,
+            dayMaxEvents: true,
             events: eventos,
 
             dateClick(info) {
-                document.querySelector(".modal-title").innerText = "Novo Evento";
-                document.getElementById("event-id").value = "";
-                document.getElementById("event-title").value = "";
-                document.getElementById("event-date").value = info.dateStr;
-                document.getElementById("delete-event").style.display = "none";
+                elId.value = "";
+                elTitle.value = "";
+                elStart.value = info.dateStr;
+                elEnd.value = info.dateStr;
+                elStartTime.value = "08:00";
+                elEndTime.value = "09:00";
+                elType.value = "trabalho";
+                elColor.value = coresPorTipo.trabalho;
+                elTitle.style.color = ajustarCorTextoEvento(elColor.value);
+                btnDelete.style.display = "none";
                 modal.show();
             },
 
             eventClick(info) {
-                document.querySelector(".modal-title").innerText = "Editar Evento";
-                document.getElementById("event-id").value = info.event.id;
-                document.getElementById("event-title").value = info.event.title;
-                document.getElementById("event-date").value = info.event.startStr;
-                document.getElementById("delete-event").style.display = "inline-block";
+                const e = info.event;
+                elId.value = e.id;
+                elTitle.value = e.title;
+                elStart.value = e.startStr.slice(0, 10);
+                elStartTime.value = e.startStr.slice(11, 16);
+                elEnd.value = e.endStr.slice(0, 10);
+                elEndTime.value = e.endStr.slice(11, 16);
+                elType.value = e.extendedProps.tipo || "trabalho";
+                elColor.value = e.backgroundColor || coresPorTipo[elType.value];
+                elTitle.style.color = ajustarCorTextoEvento(elColor.value);
+                btnDelete.style.display = "inline-block";
                 modal.show();
             },
 
-            async eventDrop(info) {
-                await updateDoc(doc(db, `usuarios/${usuarioId}/eventos/${info.event.id}`), {
-                    title: info.event.title,
-                    date: info.event.startStr
-                });
+            eventDidMount(info) {
+                info.el.style.color = ajustarCorTextoEvento(info.event.backgroundColor || "#ffffff");
             }
         });
 
         calendar.render();
 
-        /* SALVAR EVENTO */
-        document.getElementById("save-event").onclick = async () => {
-            const id = document.getElementById("event-id").value;
-            const title = document.getElementById("event-title").value.trim();
-            const date = document.getElementById("event-date").value;
+        btnSave.onclick = async () => {
+            const id = elId.value;
+            const title = elTitle.value.trim();
+            if (!title) return alert("Digite um título");
 
-            if (!title) return alert("Digite o título");
+            const data = {
+                title,
+                start: `${elStart.value}T${elStartTime.value}`,
+                end: `${elEnd.value}T${elEndTime.value}`,
+                tipo: elType.value,
+                color: elColor.value
+            };
 
-            if (id === "") {
-                const ref = await addDoc(collection(db, `usuarios/${usuarioId}/eventos`), {
-                    title, date
-                });
-                calendar.addEvent({ id: ref.id, title, start: date });
+            if (!id) {
+                const ref = await addDoc(collection(db, `usuarios/${usuarioId}/eventos`), data);
+                const ev = calendar.addEvent({ id: ref.id, ...data });
+                ev.setProp("textColor", ajustarCorTextoEvento(data.color));
             } else {
-                await updateDoc(doc(db, `usuarios/${usuarioId}/eventos/${id}`), {
-                    title, date
-                });
+                await updateDoc(doc(db, `usuarios/${usuarioId}/eventos/${id}`), data);
                 const ev = calendar.getEventById(id);
-                ev.setProp("title", title);
-                ev.setStart(date);
+                ev.setProp("title", data.title);
+                ev.setStart(data.start);
+                ev.setEnd(data.end);
+                ev.setProp("color", data.color);
+                ev.setProp("textColor", ajustarCorTextoEvento(data.color));
             }
 
             modal.hide();
         };
 
-        /* EXCLUIR EVENTO */
-        document.getElementById("delete-event").onclick = async () => {
-            const id = document.getElementById("event-id").value;
+        btnDelete.onclick = async () => {
+            const id = elId.value;
             await deleteDoc(doc(db, `usuarios/${usuarioId}/eventos/${id}`));
-
-            const ev = calendar.getEventById(id);
-            if (ev) ev.remove();
-
+            calendar.getEventById(id)?.remove();
             modal.hide();
         };
     }
-
 </script>
-
 
 </body>
 </html>
