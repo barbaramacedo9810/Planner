@@ -1,123 +1,142 @@
 /* ==========================================================
-   RESPONSIVIDADE DA PÁGINA DE LOGIN (index.html)
+   RESPONSIVIDADE — PÁGINA DE LOGIN APENAS
+   (index.html | body.login-page)
    ========================================================== */
 
-/* -----------  DESKTOP (+1200px) ----------- */
+
+/* ==================================================
+   DESKTOP GRANDE (≥ 1200px)
+   ================================================== */
 @media (min-width: 1200px) {
 
-    .login-side {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding-right: 40px;
+    body.login-page .main-container {
+        max-width: 1400px;
+        height: 720px;
     }
 
-    .login-container {
+    body.login-page .image-side {
+        flex: 1.6;
+    }
+
+    body.login-page .login-side {
+        flex: 0 0 480px;
+        padding-right: 50px;
+    }
+
+    body.login-page .login-container {
         max-width: 420px;
-    }
-
-    .image-side {
-        background-size: contain;
-        background-position: left center;
     }
 }
 
-/* -----------  TABLET (768–1199px) ----------- */
+
+/* ==================================================
+   TABLET (768px – 1199px)
+   ================================================== */
 @media (min-width: 768px) and (max-width: 1199px) {
 
-    body {
-        background-color: #FFF5E6 !important;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding-top: 56px;
+    body.login-page {
+        padding-top: 70px;
     }
 
-    .main-container {
+    body.login-page .main-container {
         width: 95%;
         max-width: 1000px;
         height: auto;
         min-height: 600px;
 
-        display: flex;
-        flex-direction: row;
-        align-items: stretch;
-        justify-content: center;
-
-        background: rgba(255, 255, 255, 0.35);
-        backdrop-filter: blur(12px);
-        border-radius: 35px;
-        overflow: hidden;
-
-        box-shadow: 0px 15px 40px rgba(0,0,0,0.25);
+        border-radius: 28px;
     }
 
-    .image-side {
+    body.login-page .image-side {
+        flex: 1.2;
+    }
+
+    body.login-page .image-side::before {
+        background-size: 75%;
+        background-position: 55% 90%;
+    }
+
+    body.login-page .login-side {
         flex: 1;
-        background-size: cover !important;
-        background-position: center !important;
-    }
-
-    .login-side {
-        flex: 1;
-        background-color: #FFF5E6 !important;
-        display: flex;
+        padding-right: 0;
         justify-content: center;
-        align-items: center;
-        padding: 40px 25px !important;
     }
 
-    .login-container {
-        width: 100%;
-        max-width: 330px !important;
-    }
-
-    .form-control {
-        padding: 12px;
-        font-size: 15px;
-    }
-
-    .btn-entrar {
-        padding: 12px;
-        font-size: 16px;
-    }
-
-    .btn-criar {
-        margin-top: 12px;
-        font-size: 14px;
+    body.login-page .login-container {
+        transform: none;
+        max-width: 360px;
     }
 }
 
-/* -----------  MOBILE (até 767px) ----------- */
+
+/* ==================================================
+   MOBILE (≤ 767px)
+   ================================================== */
 @media (max-width: 767px) {
 
-    .image-side {
+    body.login-page {
+        background: #FFF5E6;
+        padding-top: 70px;
+    }
+
+    body.login-page .main-container {
+        width: 100%;
+        height: auto;
+
+        flex-direction: column;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+    }
+
+    /* Esconde imagem no mobile */
+    body.login-page .image-side {
         display: none !important;
     }
 
-    body {
-        background-color: #FFF5E6;
-    }
-
-    .main-container {
-        flex-direction: column;
-        align-items: center;
-        background-color: #FFF5E6;
-    }
-
-    .login-side {
+    body.login-page .login-side {
         width: 100%;
-        display: flex;
+        padding: 20px;
         justify-content: center;
     }
 
-    .login-container {
-        width: 90%;
+    body.login-page .login-container {
+        width: 100%;
         max-width: 400px;
-        margin: 30px 0;
+        transform: none;
+        border-radius: 22px;
     }
 }
+
+
+/* ==================================================
+   MOBILE PEQUENO (≤ 420px)
+   ================================================== */
+@media (max-width: 420px) {
+
+    body.login-page .login-container {
+        padding: 28px 22px;
+    }
+
+    body.login-page .title {
+        font-size: 20px;
+    }
+
+    body.login-page .subtitle {
+        font-size: 12px;
+    }
+
+    body.login-page .form-control {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    body.login-page .btn-entrar {
+        font-size: 15px;
+        padding: 11px;
+    }
+}
+
 
 /* ————————————————————————————————
    TABLET (entre 768px e 1199px)
@@ -217,3 +236,100 @@
 @media (max-width: 420px) {
     h1 { font-size: 20px; }
     .navbar-brand { font-size: 14px !important; }
+}
+
+/* ----------- PÁGINA DO CALENDARIO ----------- */
+
+
+    /* ---------- DESKTOP (>= 1200px) ---------- */
+    @media (min-width: 1200px) {
+
+        .pagina-calendario #calendar {
+            max-width: 1100px;
+            margin: 30px auto;
+        }
+    }
+
+    /* ---------- TABLET (768px – 1199px) ---------- */
+    @media (min-width: 768px) and (max-width: 1199px) {
+
+        .pagina-calendario #calendar {
+            width: 95%;
+            margin: 20px auto;
+        }
+
+        /* Toolbar mais compacta */
+        .pagina-calendario .fc-toolbar {
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .pagina-calendario .fc-toolbar-title {
+            font-size: 22px;
+            text-align: center;
+            width: 100%;
+        }
+    }
+
+    /* ---------- MOBILE (até 767px) ---------- */
+    @media (max-width: 767px) {
+
+        /* Container geral */
+        .pagina-calendario #calendar {
+            width: 100%;
+            margin: 15px auto;
+            padding: 10px;
+        }
+
+        /* Toolbar em coluna */
+        .pagina-calendario .fc-toolbar {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .pagina-calendario .fc-toolbar-title {
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        /* Botões menores */
+        .pagina-calendario .fc-button {
+            padding: 6px 10px;
+            font-size: 13px;
+        }
+
+        /* Dias da semana */
+        .pagina-calendario .fc-col-header-cell-cushion {
+            font-size: 12px;
+        }
+
+        /* Números dos dias */
+        .pagina-calendario .fc-daygrid-day-number {
+            font-size: 13px;
+        }
+
+        /* Remove excesso de altura */
+        .pagina-calendario .fc-daygrid-day-frame {
+            min-height: 70px;
+        }
+    }
+
+    /* ---------- MOBILE PEQUENO (<= 420px) ---------- */
+    @media (max-width: 420px) {
+
+        .pagina-calendario .fc-toolbar-title {
+            font-size: 16px;
+        }
+
+        .pagina-calendario .fc-button {
+            font-size: 12px;
+            padding: 5px 8px;
+        }
+
+        .pagina-calendario .fc-daygrid-day-number {
+            font-size: 12px;
+        }
+    }
+

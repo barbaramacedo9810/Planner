@@ -1,25 +1,27 @@
-/* -------------------------------------------------- */
-/* GERAL                                               */
-/* -------------------------------------------------- */
+/* ================================================== */
+/* GERAL (SITE TODO)                                  */
+/* ================================================== */
+
 body {
     background: #f4f8ff !important;
     padding-top: 80px;
     font-family: 'Segoe UI', Arial, sans-serif;
 }
 
-/* CONTAINER PRINCIPAL */
+/* CONTAINER PADRÃO DAS PÁGINAS */
 .main-wrapper {
-    max-width: 1150px;
-    margin: auto;
+    max-width: 1100px;
+    margin: 90px auto 60px;
     background: white;
     border-radius: 12px;
-    padding: 25px;
+    padding: 24px;
     box-shadow: 0 4px 20px #0001;
 }
 
-/* -------------------------------------------------- */
-/* NAVBAR SUAVE                                        */
-/* -------------------------------------------------- */
+/* ================================================== */
+/* NAVBAR                                             */
+/* ================================================== */
+
 .custom-navbar {
     background: rgba(245, 238, 228, 0.90);
     backdrop-filter: blur(8px);
@@ -42,9 +44,10 @@ body {
     transform: translateY(-2px);
 }
 
-/* -------------------------------------------------- */
-/* TÍTULOS / TEXTO                                     */
-/* -------------------------------------------------- */
+/* ================================================== */
+/* TÍTULOS                                            */
+/* ================================================== */
+
 h1 {
     font-weight: bold;
     font-size: 32px;
@@ -57,137 +60,16 @@ h1 {
     color: #6AB6F5;
 }
 
-/* -------------------------------------------------- */
-/* BOX AZUL — RESUMO                                   */
-/* -------------------------------------------------- */
-.resumo-box {
-    background: #eef6ff;
-    padding: 18px;
-    border-radius: 10px;
-    border-left: 5px solid #6AB6F5;
-    font-size: 16px;
-    position: relative;
-    min-height: 240px;
-    overflow: visible;
-}
+/* ================================================== */
+/* BOX RESUMO (AZUL)                                  */
+/* ================================================== */
 
-.img-resumo-decor {
-    position: absolute;
-    bottom: -327px;
-    right: -490px;
-    width: 1250px;
-    pointer-events: none;
-}
-
-/* -------------------------------------------------- */
-/* TABELA                                              */
-/* -------------------------------------------------- */
-table {
-    background: #fff;
-    border-radius: 10px;
-    overflow: hidden;
-    width: 100%;
-}
-
-.table-responsive {
-    overflow-x: auto;
-}
-
-thead {
-    background: #bfe0ff !important;
-}
-
-table td, table th {
-    padding: 10px;
-}
-
-.table-warning {
-    background: #ffe8c8 !important;
-}
-
-/* -------------------------------------------------- */
-/* RENDAS                                              */
-/* -------------------------------------------------- */
-.renda-card {
-    background: #fff4dd;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px #0001;
-}
-
-.renda-item {
-    background: #ffeccc;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    border: 1px solid #0001;
-}
-
-/* -------------------------------------------------- */
-/* BOX ROSA — AFIRMAÇÕES                               */
-/* -------------------------------------------------- */
-.affirm-box {
-    border: 3px solid #d6698c;
-    background: #ffeff5;
-    padding: 20px;
-    border-radius: 12px;
-    min-height: 520px;
-    box-shadow: 0 4px 10px #0001;
-    position: relative;
-    overflow: visible;
-}
-
-.affirm-title {
-    font-weight: bold;
-    color: #d45782;
-    margin-bottom: 15px;
-    font-size: 20px;
-}
-
-.affirm-item {
-    background: #ffe3f0;
-    border-left: 4px solid #d45782;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 12px;
-    font-size: 15px;
-    line-height: 1.4;
-}
-
-.img-affirm-decor {
-    position: absolute;
-    bottom: -120px;
-    right: -210px;
-    width: 750px;
-    pointer-events: none;
-}
-
-
-/* -------------------------------------------------- */
-/* CONTENTEDITABLE FIX                                 */
-/* -------------------------------------------------- */
-[contenteditable="true"] {
-    outline: none;
-    min-width: 60px;
-    display: inline-block;
-}
-td[contenteditable="true"], div[contenteditable="true"], span[contenteditable="true"] {
-    padding: 4px;
-}
-
-/* Layout do painel principal (segunda def duplicada — mantido) */
-.main-wrapper {
-    padding: 24px;
-    max-width: 1100px;
-    margin: 90px auto 60px;
-}
-
-/* -------------------------------------------------- */
-/* IMAGEM DO PORQUINHO                                 */
-/* -------------------------------------------------- */
 .resumo-box {
     background: #eef6ff;
     border-left: 4px solid #6fb0ff;
-    min-height: 120px;
+    border-radius: 10px;
+    padding: 18px;
+    min-height: 240px;
     position: relative;
     overflow: visible;
 }
@@ -198,65 +80,116 @@ td[contenteditable="true"], div[contenteditable="true"], span[contenteditable="t
 
 .resumo-box .resumo-img {
     position: absolute;
-    display: block;
-    margin: 10px auto 0;
     max-width: 1100px;
     right: 85px;
     left: 455px;
     bottom: -257px;
-    pointer-events: none; /* <-- IMPORTANTE */
+    pointer-events: none;
 }
 
-/* -------------------------------------------------- */
-/* IMAGEM MENININHA                                    */
-/* -------------------------------------------------- */
+/* ================================================== */
+/* TABELAS                                            */
+/* ================================================== */
+
+table {
+    background: #fff;
+    border-radius: 10px;
+    width: 100%;
+    overflow: hidden;
+}
+
+table td,
+table th {
+    padding: 10px;
+}
+
+thead {
+    background: #bfe0ff !important;
+}
+
+.table-warning {
+    background: #ffe8c8 !important;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* ================================================== */
+/* RENDAS                                             */
+/* ================================================== */
+
+.renda-card {
+    background: #fff4dd;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px #0001;
+    overflow: hidden;
+}
+
+.renda-item {
+    background: #ffeccc;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #0001;
+}
+
+/* ================================================== */
+/* AFIRMAÇÕES (ROSA)                                  */
+/* ================================================== */
+
 .affirm-box {
     background: #ffeef6;
-    border-radius: 8px;
-    padding: 18px;
+    border: 3px solid #d6698c;
+    border-radius: 12px;
+    padding: 20px;
+    min-height: 520px;
+    box-shadow: 0 4px 10px #0001;
     position: relative;
 }
 
-.affirm-list .affirm-item {
+.affirm-title {
+    font-weight: bold;
+    color: #d45782;
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+.affirm-item {
     background: #fff0f6;
-    border: 1px solid rgba(255,20,147,0.08);
     border-left: 6px solid rgba(255,20,147,0.12);
-    padding: 10px;
-    margin-bottom: 10px;
+    padding: 12px;
     border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 15px;
 }
 
 .menininha-img {
     position: absolute;
-    display: block;
-    margin: 12px auto 0;
     max-width: 850px;
-    right: 0px;
     left: -235px;
     bottom: -145px;
-    pointer-events: none; /* <-- IMPORTANTE */
+    pointer-events: none;
 }
 
-/* Rendas box style (decorative) */
-.renda-card {
-    border-radius: 8px;
-    overflow: hidden;
+/* ================================================== */
+/* CONTENTEDITABLE                                    */
+/* ================================================== */
+
+[contenteditable="true"] {
+    outline: none;
+    min-width: 60px;
 }
 
-/* Melhor visual das células contenteditable */
-tbody td[contenteditable="true"], div[contenteditable="true"] {
-    background: transparent;
+td[contenteditable="true"],
+div[contenteditable="true"] {
+    padding: 4px;
     min-height: 22px;
 }
 
-/* footer total */
-tfoot tr td {
-    vertical-align: middle;
-}
-
-/* -------------------------------------------------- */
-/* FIX FINAL – BOTÕES CLICÁVEIS                        */
-/* -------------------------------------------------- */
+/* ================================================== */
+/* BOTÕES SEMPRE CLICÁVEIS                            */
+/* ================================================== */
 
 button,
 .btn,
@@ -271,3 +204,87 @@ table,
     z-index: 10;
 }
 
+/* ================================================== */
+/* LOGIN PAGE — TOTALMENTE ISOLADO                    */
+/* ================================================== */
+
+body.login-page {
+    background: linear-gradient(135deg, #f4f8ff, #ffe8d2) !important;
+    padding-top: 0;
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ignora layout padrão */
+body.login-page .main-wrapper {
+    all: unset;
+}
+
+/* container do login */
+body.login-page .main-container {
+    position: relative;
+    isolation: isolate;
+
+    display: flex;
+    width: 100%;
+    max-width: 1400px;
+    height: 720px;
+
+    border-radius: 32px;
+    border: 2px solid #f3cfae;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.12);
+    overflow: hidden;
+}
+
+/* efeito apagado */
+body.login-page .main-container::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(10px);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* conteúdo acima do vidro */
+body.login-page .image-side,
+body.login-page .login-side {
+    position: relative;
+    z-index: 2;
+}
+
+/* imagem */
+body.login-page .image-side {
+    flex: 1.6;
+}
+
+body.login-page .image-side::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("img/login1.png") no-repeat;
+    background-size: 87%;
+    background-position: 60% 95%;
+}
+
+/* login */
+body.login-page .login-side {
+    flex: 0 0 480px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 50px;
+}
+
+body.login-page .login-container {
+    background: #FFF5E6;
+    padding: 36px;
+    border-radius: 26px;
+    border: 2px solid #bee9ff;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.14);
+    transform: translateX(150px);
+}
