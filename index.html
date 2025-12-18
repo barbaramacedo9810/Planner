@@ -10,26 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
-        /* =========================
-          BASE
-       ========================= */
-        /*body.login-page {*/
-        /*    margin: 0;*/
-        /*    font-family: "Poppins", sans-serif;*/
-        /*    min-height: 100vh;*/
-
-        /*    !* fundo principal *!*/
-        /*    background: url("img/login.png") center / cover no-repeat fixed;*/
-
-        /*    display: flex;*/
-        /*    justify-content: center;*/
-        /*    align-items: center;*/
-        /*    padding-top: 80px;*/
-
-        /*    position: relative;*/
-        /*    overflow: hidden;*/
-        /*}*/
-
+        /* BASE */
         body.login-page {
             margin: 0;
             font-family: "Poppins", sans-serif;
@@ -52,27 +33,23 @@
             position: absolute;
             inset: 0;
 
-            background: url("img/login3.png") center / cover no-repeat fixed;
+            background: url("img/login.png") center / cover no-repeat fixed;
 
             opacity: 0.6; /* 👉 50% */
 
             z-index: 0;
             pointer-events: none;
         }
-
-        /* =========================
-           FIGURINHA DE FUNDO (FIGMA)
-           👉 FORA DO CARD
-        ========================= */
+        /* FIGURINHA DE FUNDO (FIGMA) 👉 FORA DO CARD */
         body.login-page::after {
             content: "";
             position: absolute;
 
-            width: 850px;
-            height: 850px;
+            width: 800px;
+            height: 800px;
 
-            right: -230px;   /* 👉 canto direito */
-            bottom: -80px;   /* 👉 canto inferior */
+            right: -155px;   /* 👉 canto direito */
+            bottom: -255px; /* 👈 abaixa mais */
 
             background-image: url("img/login-sticker.png");
             background-repeat: no-repeat;
@@ -86,9 +63,7 @@
             pointer-events: none;
         }
 
-        /* =========================
-           CONTAINER PRINCIPAL
-        ========================= */
+        /* CONTAINER PRINCIPAL */
         .main-container {
             position: relative;
             display: flex;
@@ -102,9 +77,9 @@
             isolation: isolate;
 
             /* vidro REAL */
-            background: rgba(255, 255, 255, 0.35);
-            backdrop-filter: blur(14px) saturate(180%);
-            -webkit-backdrop-filter: blur(14px) saturate(180%);
+            background: rgba(255, 255, 255, 0.28); /* mais translúcido */
+            backdrop-filter: blur(18px) saturate(300%);
+            -webkit-backdrop-filter: blur(18px) saturate(300%);
 
             border: 1px solid rgba(255, 255, 255, 0.35);
 
@@ -115,9 +90,7 @@
             z-index: 1;
         }
 
-        /* =========================
-           LADO DA IMAGEM
-        ========================= */
+        /* LADO DA IMAGEM */
         .image-side {
             flex: 1.6;
             position: relative;
@@ -131,13 +104,11 @@
 
             background-image: url("img/login1.png");
             background-repeat: no-repeat;
-            background-size: 72%;
-            background-position: 45% 95%;
+            background-size: 65%;
+            background-position: 50% 180%;
         }
 
-        /* =========================
-           LOGIN
-        ========================= */
+        /* LOGIN */
         .login-side {
             flex: 0 0 480px;
             display: flex;
@@ -168,9 +139,7 @@
                     inset 0 0 0.5px rgba(255,255,255,0.9);
         }
 
-        /* =========================
-           TEXTO
-        ========================= */
+        /* TEXTO */
         .title {
             text-align: center;
             font-size: 22px;
@@ -185,9 +154,7 @@
             color: #6b6b6b;
         }
 
-        /* =========================
-           FORM
-        ========================= */
+        /* FORM */
         .form-control {
             border-radius: 12px;
             padding: 12px;
@@ -218,9 +185,7 @@
             text-decoration: underline;
         }
 
-        /* =========================
-           RESPONSIVO
-        ========================= */
+        /* RESPONSIVIDADE */
         @media (max-width: 991px) {
             .main-container {
                 height: auto;
@@ -245,7 +210,7 @@
 <body class="login-page">
 
 <!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg fixed-top shadow-sm" style="background-color: #FFF5E6;">
+<nav class="navbar navbar-expand-lg fixed-top shadow-sm" style="background-color: #e3ecff;">
     <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center" href="#">
             <i class="bi bi-journal-check" style="font-size:22px; margin-right:6px;"></i>
